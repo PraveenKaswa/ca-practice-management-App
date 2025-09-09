@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - CA Practice Management</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background-color: #34495e;
+        }
+
+        .nav-menu a.active {
+            background-color: #34495e;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            color: #2c3e50;
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+        }
+
+        .page-subtitle {
+            color: #7f8c8d;
+            margin: 0;
+        }
+
+        .report-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .report-category {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .category-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .category-body {
+            padding: 1.5rem;
+        }
+
+        .report-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .report-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .report-item:last-child {
+            border-bottom: none;
+        }
+
+        .report-info {
+            flex: 1;
+        }
+
+        .report-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .report-description {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-generate {
+            background-color: #27ae60;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        .btn-generate:hover {
+            background-color: #229954;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-customize {
+            background-color: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        .btn-customize:hover {
+            background-color: #2980b9;
+            text-decoration: none;
+            color: white;
+        }
+
+        .quick-stats {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .stats-title {
+            color: #2c3e50;
+            margin: 0 0 1rem 0;
+            font-size: 1.3rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+            margin: 0;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            margin: 0.5rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .recent-reports {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .recent-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .recent-title {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .view-all-link {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .view-all-link:hover {
+            text-decoration: underline;
+        }
+
+        .recent-list {
+            padding: 0;
+        }
+
+        .recent-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+
+        .recent-info {
+            flex: 1;
+        }
+
+        .recent-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .recent-meta {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .recent-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.25rem 0.5rem;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        .btn-download {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-view {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .custom-report {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .custom-title {
+            font-size: 1.5rem;
+            margin: 0 0 1rem 0;
+        }
+
+        .custom-description {
+            margin: 0 0 1.5rem 0;
+            opacity: 0.9;
+        }
+
+        .btn-custom {
+            background-color: white;
+            color: #8e44ad;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation Header -->
+<div class="header">
+    <div class="logo">CA Practice Management</div>
+    <nav class="nav-menu">
+        <a href="/">Dashboard</a>
+        <a href="/clients">Clients</a>
+        <a href="/services">Services</a>
+        <a href="/documents">Documents</a>
+        <a href="/reports" class="active">Reports</a>
+        <a href="/about">About</a>
+        <a href="/logout">Logout</a>
+    </nav>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Reports & Analytics</h1>
+        <p class="page-subtitle">Generate comprehensive reports and analyze your practice performance</p>
+    </div>
+
+    <!-- Quick Statistics -->
+    <div class="quick-stats">
+        <h3 class="stats-title">Practice Overview</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h3 class="stat-value">₹12.5L</h3>
+                <p class="stat-label">This Month Revenue</p>
+            </div>
+            <div class="stat-item">
+                <h3 class="stat-value">45</h3>
+                <p class="stat-label">Active Clients</p>
+            </div>
+            <div class="stat-item">
+                <h3 class="stat-value">89%</h3>
+                <p class="stat-label">Tasks Completed</p>
+            </div>
+            <div class="stat-item">
+                <h3 class="stat-value">23</h3>
+                <p class="stat-label">Reports Generated</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Report Builder -->
+    <div class="custom-report">
+        <h2 class="custom-title">🎯 Custom Report Builder</h2>
+        <p class="custom-description">Create tailored reports with specific parameters and filters for your unique needs</p>
+        <button class="btn-custom">Build Custom Report</button>
+    </div>
+
+    <!-- Report Categories -->
+    <div class="report-categories">
+        <!-- Financial Reports -->
+        <div class="report-category">
+            <div class="category-header">
+                <span class="category-icon">💰</span>
+                <h3 class="category-title">Financial Reports</h3>
+            </div>
+            <div class="category-body">
+                <ul class="report-list">
+                    <li class="report-item">
+                        <div class="report-info">
+                            <h4 class="report-name">Revenue Summary</h4>
+                            <p class="report-description">Monthly and yearly revenue breakdown by client and service</p>
+                        </div>
+                        <div class="report-actions">
+                            <a href="/reports/revenue/generate" class="btn-generate">Generate</a>
+                            <a href="/reports/revenue/customize" class="btn-customize">Customize</a>
+                        </div>
+                    </li>
+                    <li class="report-item">
+                        <div class="report-info">
+                            <h4 class="report-name">Invoice Report</h4>
+                            <p class="report-description">Detailed invoice tracking and payment status</p>
+                        </div>
+                        <div class="report-actions">
+                            <a href="/reports/invoice/generate" class="btn-generate">Generate</a>
+                            <a href="/reports/invoice/customize" class="btn-customize">Customize</a>
+                        </div>
+                    </li>
+                    <li class="report-item">
+                        <div class="report-info">
+                            <h4 class="report-name">Expense Analysis</h4>
+                            <p class="report-description">Practice expenses and cost analysis</p>
+                        </div>
+                        <div class="report-actions">
+                            <a href="/reports/expense/generate" class="btn-generate">Generate</a>
+                            <a href="/reports/expense/customize" class="btn-customize">Customize</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Client Reports -->
+        <div class="report-category">
+            <div class="category-header">
+                <span class="category-icon">👥</span>
+                <h3 class="category-title">Client Reports</h3>
+            </div>
+            <div class="category-body">
+                <ul class="report-list">
+                    <li class="report-item">
+                        <div class="report-info">
+                            <h4 class="report-name">Client Portfolio</h4>
+                            <p class="report-description">Complete client information and service history</p>
+                        </div>
+                        <div class="report-actions">
+                            <a href="/reports/client-portfolio/generate" class="btn-generate">Generate</a>
+                            <a href="/reports/client-portfolio/customize" class="btn-customize">Customize</a>
+                        </div>
+                    </li>
+                    <li class="report-item">
+                        <div class="report-info">
+                            <h4 class="report-name">Client Performance</h4>
+                            <p class="report-description">Revenue per client and profitability analysis</p>
+                        </div>
+                        <div class="report-actions">
+                            <a href="/reports/client-performance/generate" class="btn-generate">Generate</a>
+                            <a href="/reports/client-performance/customize" class="btn-customize">Customize</a>
+                        </div>
+                    </li>
+                    <li class="report-item">
+                        <div class="report-info">
+                            <h4 class="report-name">New Client Acquisition</h4>
+                            <p class="report-description">Track new client onboarding and growth trends</p>
+                        </div>
+                        <div class="report-actions">
+                            <a href="/reports/new-clients/generate" class="btn-generate">Generate</a>
+                            <a href="/reports/new-clients/customize" class="btn-customize">Customize</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Service Reports -->
+        <div class="report-category">
+            <div class="category-header">
+                <span class="category-icon">📋</span>
+                <h3 class="category-title">Service Reports</h3>
+            </div>
+            <div class="category-body">
+                <ul class="report-list">
+                    <li class="report-item">
+                        <div class="report-info">
+                            <h4 class="report-name">Service Utilization</h4>
+                            <p class="report-description">Most requested services and demand analysis</p>
+                        </div>
+                        <div class="report-actions">
+                            <a href="/reports/service-utilization/generate" class="btn-generate">Generate</a>
+                            <a href="/reports/service-utilization/customize" class="btn-customize">Customize</a>
+                        </div>
+                    </li>
+                    <li class="report-item">
+                        <div class="report-info">
+                            <h4 class="report-name">Task Completion</h4>
+                            <p class="report-description">Service delivery timelines and efficiency metrics</p>
+                        </div>
+                        <div class="report-actions">
+                            <a href="/reports/task-completion/generate" class="btn-generate">Generate</a>
+                            <a href="/reports/task-completion/customize" class="btn-customize">Customize</a>
+                        </div>
+                    </li>
+                    <li class="report-item">
+                        <div class="report-info">
+                            <h4 class="report-name">Deadline Compliance</h4>
+                            <p class="report-description">Track compliance with statutory and client deadlines</p>
+                        </div>
+                        <div class="report-actions">
+                            <a href="/reports/deadline-compliance/generate" class="btn-generate">Generate</a>
+                            <a href="/reports/deadline-compliance/customize" class="btn-customize">Customize</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Compliance Reports -->
+        <div class="report-category">
+            <div class="category-header">
+                <span class="category-icon">📊</span>
+                <h3 class="category-title">Compliance Reports</h3>
+            </div>
+            <div class="category-body">
+                <ul class="report-list">
+                    <li class="report-item">
+                        <div class="report-info">
+                            <h4 class="report-name">Tax Filing Status</h4>
+                            <p class="report-description">ITR and other tax filing compliance tracking</p>
+                        </div>
+                        <div class="report-actions">
+                            <a href="/reports/tax-filing/generate" class="btn-generate">Generate</a>
+                            <a href="/reports/tax-filing/customize" class="btn-customize">Customize</a>
+                        </div>
+                    </li>
+                    <li class="report-item">
+                        <div class="report-info">
+                            <h4 class="report-name">GST Compliance</h4>
+                            <p class="report-description">GST return filing and payment status</p>
+                        </div>
+                        <div class="report-actions">
+                            <a href="/reports/gst-compliance/generate" class="btn-generate">Generate</a>
+                            <a href="/reports/gst-compliance/customize" class="btn-customize">Customize</a>
+                        </div>
+                    </li>
+                    <li class="report-item">
+                        <div class="report-info">
+                            <h4 class="report-name">Audit Schedule</h4>
+                            <p class="report-description">Upcoming audits and compliance requirements</p>
+                        </div>
+                        <div class="report-actions">
+                            <a href="/reports/audit-schedule/generate" class="btn-generate">Generate</a>
+                            <a href="/reports/audit-schedule/customize" class="btn-customize">Customize</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recently Generated Reports -->
+    <div class="recent-reports">
+        <div class="recent-header">
+            <h3 class="recent-title">Recently Generated Reports</h3>
+            <a href="/reports/history" class="view-all-link">View All Reports</a>
+        </div>
+        <div class="recent-list">
+            <div class="recent-item">
+                <div class="recent-info">
+                    <h4 class="recent-name">March 2024 Revenue Summary</h4>
+                    <p class="recent-meta">Generated on 01-Apr-2024 • 156 KB • PDF</p>
+                </div>
+                <div class="recent-actions">
+                    <a href="/reports/1/view" class="btn-small btn-view">View</a>
+                    <a href="/reports/1/download" class="btn-small btn-download">Download</a>
+                </div>
+            </div>
+            <div class="recent-item">
+                <div class="recent-info">
+                    <h4 class="recent-name">Client Portfolio Report</h4>
+                    <p class="recent-meta">Generated on 28-Mar-2024 • 234 KB • PDF</p>
+                </div>
+                <div class="recent-actions">
+                    <a href="/reports/2/view" class="btn-small btn-view">View</a>
+                    <a href="/reports/2/download" class="btn-small btn-download">Download</a>
+                </div>
+            </div>
+            <div class="recent-item">
+                <div class="recent-info">
+                    <h4 class="recent-name">GST Compliance Status</h4>
+                    <p class="recent-meta">Generated on 25-Mar-2024 • 89 KB • Excel</p>
+                </div>
+                <div class="recent-actions">
+                    <a href="/reports/3/view" class="btn-small btn-view">View</a>
+                    <a href="/reports/3/download" class="btn-small btn-download">Download</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

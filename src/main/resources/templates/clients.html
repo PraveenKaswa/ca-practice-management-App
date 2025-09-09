@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clients - CA Practice Management</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background-color: #34495e;
+        }
+
+        .nav-menu a.active {
+            background-color: #34495e;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .add-btn {
+            background-color: #27ae60;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+
+        .add-btn:hover {
+            background-color: #229954;
+            text-decoration: none;
+            color: white;
+        }
+
+        .search-filter-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .filter-select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-width: 120px;
+        }
+
+        .search-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .clients-table {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background-color: #34495e;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.25rem 0.5rem;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        .btn-view {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-edit {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .no-clients {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            gap: 1rem;
+        }
+
+        .pagination a {
+            padding: 0.5rem 1rem;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .pagination a.active {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation Header -->
+<div class="header">
+    <div class="logo">CA Practice Management</div>
+    <nav class="nav-menu">
+        <a href="/">Dashboard</a>
+        <a href="/clients" class="active">Clients</a>
+        <a href="/services">Services</a>
+        <a href="/documents">Documents</a>
+        <a href="/reports">Reports</a>
+        <a href="/about">About</a>
+        <a href="/logout">Logout</a>
+    </nav>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Client Management</h1>
+        <a href="/clients/new" class="add-btn">+ Add New Client</a>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="search-filter-section">
+        <div class="search-row">
+            <input type="text" class="search-input" placeholder="Search clients by name, PAN, or company...">
+            <select class="filter-select">
+                <option value="">All Types</option>
+                <option value="individual">Individual</option>
+                <option value="company">Company</option>
+                <option value="partnership">Partnership</option>
+                <option value="llp">LLP</option>
+            </select>
+            <select class="filter-select">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+            <button class="search-btn">Search</button>
+        </div>
+    </div>
+
+    <!-- Clients Table -->
+    <div class="clients-table">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Client Name</th>
+                <th>Company</th>
+                <th>PAN Number</th>
+                <th>Phone</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Registration Date</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Real Data from Database using Thymeleaf -->
+            <tr th:if="${clients == null or clients.empty}">
+                <td colspan="8" class="no-clients">
+                    <h3>No clients found</h3>
+                    <p>Add your first client to get started!</p>
+                </td>
+            </tr>
+
+            <tr th:each="client : ${clients}" th:unless="${clients == null or clients.empty}">
+                <td th:text="${client.clientName}">Client Name</td>
+                <td th:text="${client.companyName != null ? client.companyName : '-'}">Company Name</td>
+                <td th:text="${client.panNumber}">PAN Number</td>
+                <td th:text="${client.phone}">Phone</td>
+                <td th:text="${client.clientType.displayName}">Type</td>
+                <td>
+                        <span th:class="${'status-badge ' + (client.status.name() == 'ACTIVE' ? 'status-active' : 'status-inactive')}"
+                              th:text="${client.status.displayName}">Status</span>
+                </td>
+                <td th:text="${#temporals.format(client.registrationDate, 'dd-MMM-yyyy')}">Registration Date</td>
+                <td>
+                    <div class="action-buttons">
+                        <a th:href="@{/clients/{id}/view(id=${client.id})}" class="btn-small btn-view">View</a>
+                        <a th:href="@{/clients/{id}/edit(id=${client.id})}" class="btn-small btn-edit">Edit</a>
+                        <a th:href="@{/clients/{id}/delete(id=${client.id})}" class="btn-small btn-delete" onclick="return confirm('Are you sure?')">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <a href="#">Previous</a>
+            <a href="#" class="active">1</a>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">Next</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
