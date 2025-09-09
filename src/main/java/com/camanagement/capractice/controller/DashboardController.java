@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -205,6 +208,101 @@ public class DashboardController {
             model.addAttribute("totalServices", 0);
             model.addAttribute("monthlyRevenue", "₹0");
             return "reports";
+        }
+
+    }
+    @GetMapping("/clients/new")
+    public String showAddClientForm(Model model) {
+        /**
+         * SHOW ADD CLIENT FORM:
+         *
+         * WHY: User clicks "Add New Client" button, needs to see the form
+         * WHAT: Create empty Client object and pass to template
+         * HOW: Thymeleaf binds form fields to this object
+         */
+
+        try {
+            // Create new empty client object for form binding
+            Client newClient = new Client();
+
+            // Set some defaults
+            newClient.setStatus(Client.ClientStatus.ACTIVE);
+            newClient.setRegistrationDate(LocalDate.now());
+
+            // Pass to template for form binding
+            model.addAttribute("client", newClient);
+
+            System.out.println("Showing add client form");
+            return "add-client"; // Returns add-client.html template
+
+        } catch (Exception e) {
+            System.err.println("ERROR showing add client form: " + e.getMessage());
+            return "redirect:/clients"; // Redirect back to clients list if error
+        }
+    }
+
+    @PostMapping("/clients/add")
+    public String addClient(@ModelAttribute("client") Client client, Model model) {
+        /**
+         * PROCESS ADD CLIENT FORM:
+         *
+         * WHY: User filled form and clicked "Add Client" - need to save to database
+         * WHAT: Take form data, validate it, save to database, redirect to success
+         * HOW: Spring automatically converts form data to Client object
+         */
+
+        try {
+            System.out.println("=== PROCESSING NEW CLIENT ===");
+            System.out.println("Client Name: " + client.getClientName());
+            System.out.println("Client Type: " + client.getClientType());
+            System.out.println("PAN: " + client.getPanNumber());
+            System.out.println("Email: " + client.getEmail());
+
+            // Basic validation
+            if (client.getClientName() == null || client.getClientName().trim().isEmpty()) {
+                model.addAttribute("error", "Client name is required");
+                return "add-client";
+            }
+
+            if (client.getPanNumber() == null || client.getPanNumber().trim().isEmpty()) {
+                model.addAttribute("error", "PAN number is required");
+                return "add-client";
+            }
+
+            // Check if PAN already exists
+            if (clientRepository.existsByPanNumber(client.getPanNumber())) {
+                model.addAttribute("error", "Client with this PAN number already exists");
+                model.addAttribute("client", client); // Keep form data
+                return "add-client";
+            }
+
+            // Check if email already exists
+            if (client.getEmail() != null && !client.getEmail().trim().isEmpty()) {
+                if (clientRepository.existsByEmail(client.getEmail())) {
+                    model.addAttribute("error", "Client with this email already exists");
+                    model.addAttribute("client", client); // Keep form data
+                    return "add-client";
+                }
+            }
+
+            // Save the client to database
+            Client savedClient = clientRepository.save(client);
+
+            System.out.println("Client saved successfully with ID: " + savedClient.getId());
+            System.out.println("=== END PROCESSING ===");
+
+            // Redirect to clients list with success message
+            // PRG pattern: Post-Redirect-Get (prevents duplicate submissions)
+            return "redirect:/clients?success=true";
+
+        } catch (Exception e) {
+            System.err.println("ERROR saving client: " + e.getMessage());
+            e.printStackTrace();
+
+            // Return to form with error message
+            model.addAttribute("error", "Failed to save client. Please try again.");
+            model.addAttribute("client", client); // Keep form data
+            return "add-client";
         }
     }
 }
