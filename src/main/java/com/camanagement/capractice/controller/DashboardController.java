@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 
 
 import java.time.LocalDate;
@@ -302,6 +303,105 @@ public class DashboardController {
             // Return to form with error message
             model.addAttribute("error", "Failed to save client. Please try again.");
             model.addAttribute("client", client); // Keep form data
+            return "add-client";
+        }
+
+    }
+
+    // ADD THESE TWO NEW METHODS TO YOUR DashboardController.java
+// Place them after your existing addClient() method
+
+    @GetMapping("/clients/{id}/edit")
+    public String showEditClientForm(@PathVariable("id") Long id, Model model) {
+        /**
+         * @PathVariable EXPLANATION:
+         *
+         * URL: /clients/123/edit
+         * @PathVariable("id") Long id → Captures "123" from URL and converts to Long
+         *
+         * So if user visits /clients/5/edit, then id = 5L
+         */
+
+        try {
+            // Find client by the ID from URL
+            Client client = clientRepository.findById(id).orElse(null);
+
+            if (client == null) {
+                System.err.println("Client not found with ID: " + id);
+                return "redirect:/clients?error=notfound";
+            }
+
+            // Pass client to template (form will be pre-filled)
+            model.addAttribute("client", client);
+            model.addAttribute("isEdit", true); // Flag to indicate edit mode
+
+            System.out.println("Showing edit form for client: " + client.getClientName());
+            return "add-client"; // Reuse the same form template
+
+        } catch (Exception e) {
+            System.err.println("ERROR showing edit client form: " + e.getMessage());
+            return "redirect:/clients?error=true";
+        }
+    }
+
+    @PostMapping("/clients/{id}/update")
+    public String updateClient(@PathVariable("id") Long id,
+                               @ModelAttribute("client") Client client,
+                               Model model) {
+        /**
+         * @PathVariable EXPLANATION:
+         *
+         * This handles POST requests to URLs like: /clients/123/update
+         * @PathVariable("id") Long id → Captures "123" from URL
+         *
+         * So when form submits to /clients/5/update, then id = 5L
+         */
+
+        try {
+            // Set the ID from URL to the client object (important for update!)
+            client.setId(id);
+
+            System.out.println("=== UPDATING CLIENT ===");
+            System.out.println("Client ID from URL: " + id);
+            System.out.println("Client Name: " + client.getClientName());
+
+            // Basic validation (same as add, but for updates)
+            if (client.getClientName() == null || client.getClientName().trim().isEmpty()) {
+                model.addAttribute("error", "Client name is required");
+                model.addAttribute("isEdit", true);
+                return "add-client";
+            }
+
+            if (client.getPanNumber() == null || client.getPanNumber().trim().isEmpty()) {
+                model.addAttribute("error", "PAN number is required");
+                model.addAttribute("isEdit", true);
+                return "add-client";
+            }
+
+            // Check if PAN already exists (but exclude current client from check)
+            Client existingPanClient = clientRepository.findByPanNumber(client.getPanNumber()).orElse(null);
+            if (existingPanClient != null && !existingPanClient.getId().equals(id)) {
+                model.addAttribute("error", "Another client with this PAN number already exists");
+                model.addAttribute("client", client);
+                model.addAttribute("isEdit", true);
+                return "add-client";
+            }
+
+            // Update the client in database
+            Client updatedClient = clientRepository.save(client);
+
+            System.out.println("Client updated successfully!");
+            System.out.println("=== END UPDATING ===");
+
+            // Redirect with success message
+            return "redirect:/clients?updated=true";
+
+        } catch (Exception e) {
+            System.err.println("ERROR updating client: " + e.getMessage());
+
+            model.addAttribute("error", "Failed to update client. Please try again.");
+            model.addAttribute("client", client);
+            model.addAttribute("isEdit", true);
             return "add-client";
         }
     }
