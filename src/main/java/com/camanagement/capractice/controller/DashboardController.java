@@ -313,30 +313,20 @@ public class DashboardController {
 
     @GetMapping("/clients/{id}/edit")
     public String showEditClientForm(@PathVariable("id") Long id, Model model) {
-        /**
-         * @PathVariable EXPLANATION:
-         *
-         * URL: /clients/123/edit
-         * @PathVariable("id") Long id → Captures "123" from URL and converts to Long
-         *
-         * So if user visits /clients/5/edit, then id = 5L
-         */
-
         try {
-            // Find client by the ID from URL
             Client client = clientRepository.findById(id).orElse(null);
 
             if (client == null) {
-                System.err.println("Client not found with ID: " + id);
                 return "redirect:/clients?error=notfound";
             }
 
-            // Pass client to template (form will be pre-filled)
             model.addAttribute("client", client);
-            model.addAttribute("isEdit", true); // Flag to indicate edit mode
+            model.addAttribute("isEdit", true);  // ← Make sure this line is there!
 
-            System.out.println("Showing edit form for client: " + client.getClientName());
-            return "add-client"; // Reuse the same form template
+            System.out.println("Edit mode - isEdit flag set to: true");
+            System.out.println("Client ID: " + client.getId());
+
+            return "add-client";
 
         } catch (Exception e) {
             System.err.println("ERROR showing edit client form: " + e.getMessage());
