@@ -200,6 +200,12 @@
         .btn-delete {
             background-color: #e74c3c;
             color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
         }
 
         .no-clients {
@@ -227,6 +233,50 @@
         .pagination a.active {
             background-color: #2980b9;
         }
+
+        .search-results-info {
+            background: #e3f2fd;
+            color: #0d47a1;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #2196f3;
+        }
+
+        .search-results-info p {
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .search-results-info em {
+            font-style: normal;
+            font-weight: 600;
+            color: #1565c0;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .alert strong {
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -252,24 +302,74 @@
         <a href="/clients/new" class="add-btn">+ Add New Client</a>
     </div>
 
+    <!-- Success Message -->
+    <div th:if="${param.success}" class="alert alert-success">
+        <strong>Success!</strong> Client has been added successfully.
+    </div>
+
+    <!-- Updated Message -->
+    <div th:if="${param.updated}" class="alert alert-success">
+        <strong>Success!</strong> Client has been updated successfully.
+    </div>
+
+    <!-- Deleted Message -->
+    <div th:if="${param.deleted}" class="alert alert-success">
+        <strong>Success!</strong> Client has been deleted successfully.
+    </div>
+
+    <!-- Error Messages -->
+    <div th:if="${param.error == 'notfound'}" class="alert alert-error">
+        <strong>Error!</strong> Client not found.
+    </div>
+
+    <div th:if="${param.error == 'true'}" class="alert alert-error">
+        <strong>Error!</strong> Something went wrong. Please try again.
+    </div>
+
+    <div th:if="${param.error == 'deletefailed'}" class="alert alert-error">
+        <strong>Error!</strong> Failed to delete client. Please try again.
+    </div>
+
     <!-- Search and Filter Section -->
     <div class="search-filter-section">
-        <div class="search-row">
-            <input type="text" class="search-input" placeholder="Search clients by name, PAN, or company...">
-            <select class="filter-select">
-                <option value="">All Types</option>
-                <option value="individual">Individual</option>
-                <option value="company">Company</option>
-                <option value="partnership">Partnership</option>
-                <option value="llp">LLP</option>
-            </select>
-            <select class="filter-select">
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-            </select>
-            <button class="search-btn">Search</button>
-        </div>
+        <form method="get" action="/clients">
+            <div class="search-row">
+                <input type="text"
+                       name="search"
+                       class="search-input"
+                       placeholder="Search clients by name, PAN, email, or company..."
+                       th:value="${searchTerm}">
+
+                <select name="type" class="filter-select">
+                    <option value="">All Types</option>
+                    <option th:each="type : ${T(com.camanagement.capractice.entity.Client$ClientType).values()}"
+                            th:value="${type}"
+                            th:text="${type.displayName}"
+                            th:selected="${type.name() == selectedType}">Client Type</option>
+                </select>
+
+                <select name="status" class="filter-select">
+                    <option value="">All Status</option>
+                    <option th:each="status : ${T(com.camanagement.capractice.entity.Client$ClientStatus).values()}"
+                            th:value="${status}"
+                            th:text="${status.displayName}"
+                            th:selected="${status.name() == selectedStatus}">Status</option>
+                </select>
+
+                <button type="submit" class="search-btn">Search</button>
+                <a href="/clients" class="search-btn" style="background-color: #6c757d; text-decoration: none; color: white;">Clear</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Search Results Info -->
+    <div th:if="${isFiltered}" class="search-results-info">
+        <p>
+            <strong th:text="${resultCount}">0</strong> client(s) found
+            <span th:if="${searchTerm != null and !searchTerm.isEmpty()}">
+                for "<em th:text="${searchTerm}">search term</em>"
+            </span>
+        </p>
     </div>
 
     <!-- Clients Table -->
@@ -291,8 +391,14 @@
             <!-- Real Data from Database using Thymeleaf -->
             <tr th:if="${clients == null or clients.empty}">
                 <td colspan="8" class="no-clients">
-                    <h3>No clients found</h3>
-                    <p>Add your first client to get started!</p>
+                    <div th:if="${isFiltered}">
+                        <h3>No matching clients found</h3>
+                        <p>Try adjusting your search criteria or <a href="/clients">view all clients</a>.</p>
+                    </div>
+                    <div th:unless="${isFiltered}">
+                        <h3>No clients found</h3>
+                        <p>Add your first client to get started!</p>
+                    </div>
                 </td>
             </tr>
 
@@ -311,7 +417,14 @@
                     <div class="action-buttons">
                         <a th:href="@{/clients/{id}/view(id=${client.id})}" class="btn-small btn-view">View</a>
                         <a th:href="@{/clients/{id}/edit(id=${client.id})}" class="btn-small btn-edit">Edit</a>
-                        <a th:href="@{/clients/{id}/delete(id=${client.id})}" class="btn-small btn-delete" onclick="return confirm('Are you sure?')">Delete</a>
+
+                        <!-- Delete Form with Confirmation -->
+                        <form th:action="@{/clients/{id}/delete(id=${client.id})}"
+                              method="post"
+                              style="display: inline;"
+                              onsubmit="return confirm('Are you sure you want to delete this client? This action cannot be undone.')">
+                            <button type="submit" class="btn-small btn-delete">Delete</button>
+                        </form>
                     </div>
                 </td>
             </tr>

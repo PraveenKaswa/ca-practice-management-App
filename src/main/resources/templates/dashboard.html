@@ -165,6 +165,33 @@
             <h2 class="stat-number" th:text="${upcomingDeadlines}">0</h2>
             <p class="stat-label">Upcoming Deadlines</p>
         </div>
+
+        <div class="stat-card">
+            <h2 class="stat-number" th:text="${overdueTasks}"
+                th:class="${overdueTasks > 0 ? 'stat-number text-danger' : 'stat-number'}">0</h2>
+            <p class="stat-label">Overdue Tasks</p>
+        </div>
+    </div>
+
+
+    <!-- Recent Activities Section -->
+    <div class="recent-activities" th:if="${recentAssignments != null and !recentAssignments.empty}">
+        <h3 class="actions-title">Recent Service Assignments</h3>
+        <div class="activity-list">
+            <div th:each="assignment : ${recentAssignments}" class="activity-item">
+                <div class="activity-info">
+                    <strong th:text="${assignment.service.serviceName}">Service Name</strong>
+                    assigned to
+                    <a th:href="@{/clients/{id}/view(id=${assignment.client.id})}"
+                       th:text="${assignment.client.clientName}">Client Name</a>
+                </div>
+                <div class="activity-meta">
+                    <span th:text="${#temporals.format(assignment.assignedDate, 'dd MMM')}">Date</span>
+                    <span th:class="'status-badge status-' + ${assignment.status.name().toLowerCase().replace('_', '-')}"
+                          th:text="${assignment.status.displayName}">Status</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Quick Actions -->
