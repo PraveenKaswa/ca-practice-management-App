@@ -268,6 +268,7 @@
 
         <form action="/services/assign" method="post" th:object="${assignment}">
             <!-- Hidden fields -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <input type="hidden" name="serviceId" th:value="${service.id}">
 
             <!-- Client Selection -->

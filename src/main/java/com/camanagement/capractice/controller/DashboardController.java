@@ -22,7 +22,6 @@ import java.util.List;
 @Controller
 public class DashboardController {
 
-
     @Autowired
     private ClientRepository clientRepository;
 
@@ -367,6 +366,7 @@ public class DashboardController {
 
             // Pass to template for form binding
             model.addAttribute("client", newClient);
+            model.addAttribute("isEdit", false);
 
             System.out.println("Showing add client form");
             return "add-client"; // Returns add-client.html template
