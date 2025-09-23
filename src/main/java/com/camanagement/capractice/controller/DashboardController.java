@@ -22,6 +22,7 @@ import java.util.List;
 @Controller
 public class DashboardController {
 
+
     @Autowired
     private ClientRepository clientRepository;
 
