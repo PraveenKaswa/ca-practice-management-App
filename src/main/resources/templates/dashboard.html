@@ -219,15 +219,19 @@
     </div>
 
     <div class="stat-card">
-        <h2 class="stat-number" th:text="${upcomingDeadlines}"
-            th:class="${upcomingDeadlines > 0 ? 'stat-number text-warning' : 'stat-number'}">0</h2>
-        <p class="stat-label">Upcoming Deadlines</p>
+        <a href="/tasks/upcoming" style="text-decoration: none; color: inherit;">
+            <h2 class="stat-number" th:text="${upcomingDeadlines}"
+                th:class="${upcomingDeadlines > 0 ? 'stat-number text-warning' : 'stat-number'}">0</h2>
+            <p class="stat-label">Upcoming Deadlines</p>
+        </a>
     </div>
 
     <div class="stat-card">
-        <h2 class="stat-number" th:text="${overdueTasks}"
-            th:class="${overdueTasks > 0 ? 'stat-number text-danger' : 'stat-number'}">0</h2>
-        <p class="stat-label">Overdue Tasks</p>
+        <a href="/tasks/overdue" style="text-decoration: none; color: inherit;">
+            <h2 class="stat-number" th:text="${overdueTasks}"
+                th:class="${overdueTasks > 0 ? 'stat-number text-danger' : 'stat-number'}">0</h2>
+            <p class="stat-label">Overdue Tasks</p>
+        </a>
     </div>
 </div>
 
@@ -250,5 +254,6 @@
         </div>
     </div>
 </div>
+
 </body>
 </html>

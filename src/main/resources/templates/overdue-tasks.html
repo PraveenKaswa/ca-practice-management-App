@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overdue Tasks - CA Practice Management</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background-color: #34495e;
+        }
+
+        .nav-menu a.active {
+            background-color: #34495e;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .page-title {
+            margin: 0 0 0.5rem 0;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .page-subtitle {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+            color: #e74c3c;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            margin: 0.5rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .action-bar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .view-options {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .tasks-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .tasks-header {
+            background: #34495e;
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tasks-title {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .task-card {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            border-left: 5px solid #e74c3c;
+        }
+
+        .task-card:last-child {
+            border-bottom: none;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .service-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .client-name {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .client-name:hover {
+            text-decoration: underline;
+        }
+
+        .task-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .overdue-info {
+            background: #ffebee;
+            color: #c62828;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .task-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .priority-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .priority-low { background-color: #e8f5e8; color: #2d5016; }
+        .priority-medium { background-color: #fff3e0; color: #e65100; }
+        .priority-high { background-color: #ffebee; color: #c62828; }
+        .priority-urgent { background-color: #fce4ec; color: #880e4f; }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-assigned { background-color: #e3f2fd; color: #0d47a1; }
+        .status-in-progress { background-color: #fff3e0; color: #e65100; }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-urgent {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-complete {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-contact {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .no-tasks {
+            text-align: center;
+            padding: 3rem;
+            color: #27ae60;
+        }
+
+        .no-tasks h3 {
+            color: #27ae60;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .task-details {
+                grid-template-columns: 1fr;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation Header -->
+<div class="header">
+    <div class="logo">CA Practice Management</div>
+    <nav class="nav-menu">
+        <a href="/" class="active">Dashboard</a>
+        <a href="/clients">Clients</a>
+        <a href="/services">Services</a>
+        <a href="/documents">Documents</a>
+        <a href="/reports">Reports</a>
+        <a href="/about">About</a>
+        <a href="/logout">Logout</a>
+    </nav>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">🚨 Overdue Tasks</h1>
+        <p class="page-subtitle">Critical tasks that require immediate attention</p>
+    </div>
+
+    <!-- Success/Update Messages -->
+    <div th:if="${param.updated == 'priority'}" class="alert alert-success">
+        <strong>Success!</strong> Task priority has been updated.
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3 class="stat-number" th:text="${totalOverdue}">0</h3>
+            <p class="stat-label">Total Overdue</p>
+        </div>
+        <div class="stat-card">
+            <h3 class="stat-number" th:text="${criticalOverdue}">0</h3>
+            <p class="stat-label">Critical (7+ days)</p>
+        </div>
+        <div class="stat-card">
+            <h3 class="stat-number" th:text="${highPriorityOverdue}">0</h3>
+            <p class="stat-label">High Priority</p>
+        </div>
+        <div class="stat-card">
+            <h3 class="stat-number">₹<span th:text="${totalRiskAmount}">0</span></h3>
+            <p class="stat-label">Est. Risk Value</p>
+        </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+        <div class="view-options">
+            <a href="/tasks/overdue" class="btn btn-primary">Overdue Tasks</a>
+            <a href="/tasks/upcoming" class="btn btn-secondary">Upcoming Tasks</a>
+        </div>
+        <div>
+            <a href="/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Overdue Tasks List -->
+    <div class="tasks-container">
+        <div class="tasks-header">
+            <h2 class="tasks-title">Overdue Service Assignments</h2>
+            <span th:text="${totalOverdue} + ' tasks require attention'">0 tasks</span>
+        </div>
+
+        <!-- No Tasks Message -->
+        <div th:if="${overdueTasks == null or overdueTasks.empty}" class="no-tasks">
+            <h3>🎉 No Overdue Tasks!</h3>
+            <p>All tasks are on schedule. Great job!</p>
+            <a href="/tasks/upcoming" class="btn btn-primary">View Upcoming Tasks</a>
+        </div>
+
+        <!-- Tasks List -->
+        <div th:unless="${overdueTasks == null or overdueTasks.empty}">
+            <div th:each="task : ${overdueTasks}" class="task-card">
+                <div class="task-header">
+                    <div class="task-info">
+                        <h3 class="service-name" th:text="${task.service.serviceName}">Service Name</h3>
+                        <a th:href="@{/clients/{id}/view(id=${task.client.id})}"
+                           class="client-name" th:text="${task.client.clientName}">Client Name</a>
+                        <div class="task-meta">
+                            <span class="overdue-info"
+                                  th:text="'Overdue by ' + ${task.dueDate.until(currentDate).days} + ' days'">
+                                Overdue by X days
+                            </span>
+                            <span th:text="'Due: ' + ${#temporals.format(task.dueDate, 'dd MMM yyyy')}">Due Date</span>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span th:class="'priority-badge priority-' + ${task.priority != null ? task.priority.name().toLowerCase() : 'medium'}"
+                              th:text="${task.priority != null ? task.priority.displayName : 'Medium'}">Priority</span>
+                        <br><br>
+                        <span th:class="'status-badge status-' + ${task.status.name().toLowerCase().replace('_', '-')}"
+                              th:text="${task.status.displayName}">Status</span>
+                    </div>
+                </div>
+
+                <div class="task-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Assigned Date</span>
+                        <span class="detail-value" th:text="${#temporals.format(task.assignedDate, 'dd MMM yyyy')}">Date</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Service Value</span>
+                        <span class="detail-value">₹<span th:text="${task.quotedPrice}">0</span></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Category</span>
+                        <span class="detail-value" th:text="${task.service.category.displayName}">Category</span>
+                    </div>
+                    <div class="detail-item" th:if="${task.notes != null and !task.notes.isEmpty()}">
+                        <span class="detail-label">Notes</span>
+                        <span class="detail-value" th:text="${task.notes}">Notes</span>
+                    </div>
+                </div>
+
+                <div class="task-actions">
+                    <!-- Quick Priority Update -->
+                    <form th:action="@{/tasks/{id}/priority(id=${task.id})}" method="post" style="display: inline;">
+                        <input type="hidden" name="returnUrl" value="/tasks/overdue">
+                        <button th:if="${task.priority == null or task.priority.name() != 'URGENT'}"
+                                type="submit" name="priority" value="URGENT"
+                                class="btn-small btn-urgent">Mark Urgent</button>
+                    </form>
+
+                    <!-- Status Update -->
+                    <form th:action="@{/assignments/{id}/status(id=${task.id})}" method="post" style="display: inline;">
+                        <input type="hidden" name="clientId" th:value="${task.client.id}">
+                        <button th:if="${task.status.name() == 'ASSIGNED'}"
+                                type="submit" name="status" value="IN_PROGRESS"
+                                class="btn-small btn-contact">Start Work</button>
+                        <button th:if="${task.status.name() == 'IN_PROGRESS'}"
+                                type="submit" name="status" value="COMPLETED"
+                                class="btn-small btn-complete">Mark Complete</button>
+                    </form>
+
+                    <!-- Quick Actions -->
+                    <a th:href="@{/clients/{id}/services(id=${task.client.id})}"
+                       class="btn-small btn-contact">View All Client Services</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

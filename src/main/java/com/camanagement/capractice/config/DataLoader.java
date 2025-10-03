@@ -1,15 +1,19 @@
 package com.camanagement.capractice.config;
 
 import com.camanagement.capractice.entity.Client;
+import com.camanagement.capractice.entity.ClientService;
 import com.camanagement.capractice.entity.Service;
 import com.camanagement.capractice.repository.ClientRepository;
+import com.camanagement.capractice.repository.ClientServiceRepository;
 import com.camanagement.capractice.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * COMPLETE DATA LOADER:
@@ -20,6 +24,9 @@ public class DataLoader implements CommandLineRunner {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private ClientServiceRepository clientServiceRepository;
 
     @Autowired
     private ServiceRepository serviceRepository;
@@ -280,5 +287,113 @@ public class DataLoader implements CommandLineRunner {
         System.out.println("Total services: " + totalServices);
         System.out.println("Active services: " + activeServices);
         System.out.println("================================");
+    }
+
+    private void createSampleServiceAssignments() {
+        System.out.println("Creating sample service assignments...");
+
+        // Get all clients and services
+        List<Client> clients = clientRepository.findAll();
+        List<Service> services = serviceRepository.findAll();
+
+        if (clients.isEmpty() || services.isEmpty()) {
+            System.out.println("No clients or services found. Skipping assignments.");
+            return;
+        }
+
+        // Assignment 1: ITR Filing for Rajesh Kumar (overdue)
+        Client rajesh = clients.stream().filter(c -> "Rajesh Kumar".equals(c.getClientName())).findFirst().orElse(clients.get(0));
+        Service itrService = services.stream().filter(s -> s.getServiceName().contains("Income Tax")).findFirst().orElse(services.get(0));
+
+        ClientService assignment1 = new ClientService();
+        assignment1.setClient(rajesh);
+        assignment1.setService(itrService);
+        assignment1.setAssignedDate(LocalDate.of(2024, 2, 15));
+        assignment1.setDueDate(LocalDate.of(2024, 3, 31)); // Past due date (overdue)
+        assignment1.setStatus(ClientService.ServiceStatus.IN_PROGRESS);
+        assignment1.setQuotedPrice(new BigDecimal("2500.00"));
+        assignment1.setNotes("ITR for FY 2023-24. Client provided all documents.");
+        clientServiceRepository.save(assignment1);
+
+        // Assignment 2: GST Registration for Priya Sharma (upcoming deadline)
+        Client priya = clients.stream().filter(c -> "Priya Sharma".equals(c.getClientName())).findFirst().orElse(clients.get(1));
+        Service gstService = services.stream().filter(s -> s.getServiceName().contains("GST")).findFirst().orElse(services.get(1));
+
+        ClientService assignment2 = new ClientService();
+        assignment2.setClient(priya);
+        assignment2.setService(gstService);
+        assignment2.setAssignedDate(LocalDate.now().minusDays(3));
+        assignment2.setDueDate(LocalDate.now().plusDays(5)); // Due in 5 days (upcoming)
+        assignment2.setStatus(ClientService.ServiceStatus.ASSIGNED);
+        assignment2.setQuotedPrice(new BigDecimal("3000.00"));
+        assignment2.setNotes("New business registration. Priority client.");
+        clientServiceRepository.save(assignment2);
+
+        // Assignment 3: Annual Audit for Patel & Associates (in progress)
+        Client patel = clients.stream().filter(c -> c.getClientName().contains("Patel")).findFirst().orElse(clients.get(2));
+        Service auditService = services.stream().filter(s -> s.getServiceName().contains("Audit")).findFirst().orElse(services.get(2));
+
+        if (patel != null && auditService != null) {
+            ClientService assignment3 = new ClientService();
+            assignment3.setClient(patel);
+            assignment3.setService(auditService);
+            assignment3.setAssignedDate(LocalDate.now().minusDays(10));
+            assignment3.setDueDate(LocalDate.now().plusDays(15));
+            assignment3.setStatus(ClientService.ServiceStatus.IN_PROGRESS);
+            assignment3.setQuotedPrice(new BigDecimal("28000.00"));
+            assignment3.setNotes("Annual audit for FY 2023-24. Complex case with multiple subsidiaries.");
+            clientServiceRepository.save(assignment3);
+        }
+
+        // Assignment 4: Financial Consulting for Tech Solutions LLP (completed)
+        Client techSolutions = clients.stream().filter(c -> c.getClientName().contains("Sunita")).findFirst().orElse(clients.get(3));
+        Service consultingService = services.stream().filter(s -> s.getServiceName().contains("Consulting")).findFirst().orElse(services.get(3));
+
+        if (techSolutions != null && consultingService != null) {
+            ClientService assignment4 = new ClientService();
+            assignment4.setClient(techSolutions);
+            assignment4.setService(consultingService);
+            assignment4.setAssignedDate(LocalDate.of(2024, 1, 15));
+            assignment4.setDueDate(LocalDate.of(2024, 2, 15));
+            assignment4.setCompletionDate(LocalDate.of(2024, 2, 10)); // Completed early
+            assignment4.setStatus(ClientService.ServiceStatus.COMPLETED);
+            assignment4.setQuotedPrice(new BigDecimal("15000.00"));
+            assignment4.setNotes("Financial restructuring consultation completed successfully.");
+            clientServiceRepository.save(assignment4);
+        }
+
+        // Assignment 5: Monthly Bookkeeping for Agarwal HUF (active)
+        Client agarwal = clients.stream().filter(c -> c.getClientName().contains("Ramesh")).findFirst().orElse(clients.get(4));
+        Service bookkeepingService = services.stream().filter(s -> s.getServiceName().contains("Bookkeeping")).findFirst().orElse(services.get(4));
+
+        if (agarwal != null && bookkeepingService != null) {
+            ClientService assignment5 = new ClientService();
+            assignment5.setClient(agarwal);
+            assignment5.setService(bookkeepingService);
+            assignment5.setAssignedDate(LocalDate.now().minusDays(30));
+            assignment5.setDueDate(LocalDate.now().plusDays(2)); // Due soon
+            assignment5.setStatus(ClientService.ServiceStatus.IN_PROGRESS);
+            assignment5.setQuotedPrice(new BigDecimal("8000.00"));
+            assignment5.setNotes("Monthly bookkeeping for March 2024.");
+            clientServiceRepository.save(assignment5);
+        }
+
+        // Assignment 6: Company Formation for Dr. Meera Verma (assigned)
+        Client meera = clients.stream().filter(c -> c.getClientName().contains("Meera")).findFirst().orElse(clients.get(5));
+        Service companyFormationService = services.stream().filter(s -> s.getServiceName().contains("Company")).findFirst().orElse(services.get(5));
+
+        if (meera != null && companyFormationService != null) {
+            ClientService assignment6 = new ClientService();
+            assignment6.setClient(meera);
+            assignment6.setService(companyFormationService);
+            assignment6.setAssignedDate(LocalDate.now().minusDays(2));
+            assignment6.setDueDate(LocalDate.now().plusDays(12));
+            assignment6.setStatus(ClientService.ServiceStatus.ASSIGNED);
+            assignment6.setQuotedPrice(new BigDecimal("15000.00"));
+            assignment6.setNotes("Setting up a subsidiary for the trust. Need DIN and DSC first.");
+            clientServiceRepository.save(assignment6);
+        }
+
+        System.out.println("Sample service assignments created successfully!");
     }
 }

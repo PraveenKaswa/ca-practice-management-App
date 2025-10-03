@@ -754,4 +754,143 @@ public class DashboardController {
             return "redirect:/clients?error=true";
         }
     }
+
+    // ADD THESE METHODS TO YOUR DashboardController.java
+
+    @GetMapping("/tasks/overdue")
+    public String overdueTasks(Model model) {
+        /**
+         * OVERDUE TASKS PAGE:
+         *
+         * Show all service assignments that are past their due date
+         * Critical for CA practice management
+         */
+
+        try {
+            System.out.println("=== LOADING OVERDUE TASKS ===");
+
+            LocalDate today = LocalDate.now();
+
+            // Get all overdue service assignments
+            List<ClientService> overdueTasks = clientServiceRepository.findOverdueServices(today);
+
+            // Sort by due date (most overdue first)
+            overdueTasks.sort((a, b) -> a.getDueDate().compareTo(b.getDueDate()));
+
+            // Calculate statistics
+            long totalOverdue = overdueTasks.size();
+            long criticalOverdue = overdueTasks.stream()
+                    .mapToLong(task -> {
+                        long daysOverdue = task.getDueDate().until(today).getDays();
+                        return daysOverdue > 7 ? 1 : 0; // More than 7 days overdue
+                    }).sum();
+
+            // Group by priority
+            long highPriorityOverdue = overdueTasks.stream()
+                    .mapToLong(task -> task.getPriority() != null &&
+                            (task.getPriority().name().equals("HIGH") || task.getPriority().name().equals("URGENT")) ? 1 : 0)
+                    .sum();
+
+            // Calculate total penalty/risk (example business logic)
+            double totalRiskAmount = overdueTasks.stream()
+                    .mapToDouble(task -> {
+                        long daysOverdue = task.getDueDate().until(today).getDays();
+                        // Estimate risk as percentage of service value
+                        double riskPercent = Math.min(daysOverdue * 0.5, 10.0); // Max 10% risk
+                        return task.getQuotedPrice().doubleValue() * (riskPercent / 100);
+                    }).sum();
+
+            System.out.println("Overdue tasks loaded: " + totalOverdue);
+            System.out.println("Critical overdue: " + criticalOverdue);
+            System.out.println("High priority overdue: " + highPriorityOverdue);
+
+            // Add to model
+            model.addAttribute("overdueTasks", overdueTasks);
+            model.addAttribute("totalOverdue", totalOverdue);
+            model.addAttribute("criticalOverdue", criticalOverdue);
+            model.addAttribute("highPriorityOverdue", highPriorityOverdue);
+            model.addAttribute("totalRiskAmount", String.format("%.2f", totalRiskAmount));
+            model.addAttribute("currentDate", today);
+
+            return "overdue-tasks";
+
+        } catch (Exception e) {
+            System.err.println("ERROR loading overdue tasks: " + e.getMessage());
+            e.printStackTrace();
+            return "redirect:/dashboard?error=overdue";
+        }
+    }
+
+    @GetMapping("/tasks/upcoming")
+    public String upcomingTasks(Model model) {
+        /**
+         * UPCOMING TASKS PAGE:
+         *
+         * Show tasks due in next 7 days - proactive management
+         */
+
+        try {
+            LocalDate today = LocalDate.now();
+            LocalDate nextWeek = today.plusDays(7);
+
+            // Get upcoming service assignments
+            List<ClientService> upcomingTasks = clientServiceRepository.findUpcomingServices(today, nextWeek);
+
+            // Sort by due date (soonest first)
+            upcomingTasks.sort((a, b) -> a.getDueDate().compareTo(b.getDueDate()));
+
+            // Statistics
+            long totalUpcoming = upcomingTasks.size();
+            long dueTomorrow = upcomingTasks.stream()
+                    .mapToLong(task -> task.getDueDate().equals(today.plusDays(1)) ? 1 : 0)
+                    .sum();
+            long dueThisWeek = upcomingTasks.stream()
+                    .mapToLong(task -> task.getDueDate().isBefore(today.plusDays(4)) ? 1 : 0)
+                    .sum();
+
+            model.addAttribute("upcomingTasks", upcomingTasks);
+            model.addAttribute("totalUpcoming", totalUpcoming);
+            model.addAttribute("dueTomorrow", dueTomorrow);
+            model.addAttribute("dueThisWeek", dueThisWeek);
+            model.addAttribute("currentDate", today);
+
+            return "upcoming-tasks";
+
+        } catch (Exception e) {
+            System.err.println("ERROR loading upcoming tasks: " + e.getMessage());
+            return "redirect:/dashboard?error=upcoming";
+        }
+    }
+
+    @PostMapping("/tasks/{taskId}/priority")
+    public String updateTaskPriority(@PathVariable("taskId") Long taskId,
+                                     @RequestParam("priority") String priorityStr,
+                                     @RequestParam(value = "returnUrl", defaultValue = "/tasks/overdue") String returnUrl) {
+        /**
+         * UPDATE TASK PRIORITY:
+         *
+         * Allow quick priority changes for task management
+         */
+
+        try {
+            ClientService task = clientServiceRepository.findById(taskId).orElse(null);
+            if (task == null) {
+                return "redirect:" + returnUrl + "?error=tasknotfound";
+            }
+
+            // Update priority
+            ClientService.Priority newPriority = ClientService.Priority.valueOf(priorityStr);
+            task.setPriority(newPriority);
+
+            clientServiceRepository.save(task);
+
+            System.out.println("Updated task priority: " + task.getService().getServiceName() + " -> " + newPriority);
+
+            return "redirect:" + returnUrl + "?updated=priority";
+
+        } catch (Exception e) {
+            System.err.println("ERROR updating task priority: " + e.getMessage());
+            return "redirect:" + returnUrl + "?error=true";
+        }
+    }
 }
