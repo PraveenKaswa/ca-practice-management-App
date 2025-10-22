@@ -9,6 +9,10 @@ import com.camanagement.capractice.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import com.camanagement.capractice.entity.Invoice;
+import com.camanagement.capractice.entity.InvoiceItem;
+import com.camanagement.capractice.repository.InvoiceRepository;
+import com.camanagement.capractice.repository.InvoiceItemRepository;
 
 
 import java.math.BigDecimal;
@@ -24,6 +28,12 @@ public class DataLoader implements CommandLineRunner {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private InvoiceRepository invoiceRepository;
+
+    @Autowired
+    private InvoiceItemRepository invoiceItemRepository;
 
     @Autowired
     private ClientServiceRepository clientServiceRepository;
@@ -50,6 +60,16 @@ public class DataLoader implements CommandLineRunner {
         // Create Services
         if (serviceRepository.count() == 0) {
             createSampleServices();
+        }
+
+        // Create Service Assignments
+        if (clientServiceRepository.count() == 0) {
+            createSampleServiceAssignments();
+        }
+
+        // Create Invoices (NEW!)
+        if (invoiceRepository.count() == 0) {
+            createSampleInvoices();
         }
 
         printStatistics();
@@ -280,12 +300,17 @@ public class DataLoader implements CommandLineRunner {
         long totalServices = serviceRepository.count();
         long activeClients = clientRepository.countByStatus(Client.ClientStatus.ACTIVE);
         long activeServices = serviceRepository.countByStatus(Service.ServiceStatus.ACTIVE);
+        long totalInvoices = invoiceRepository.count();
+        long paidInvoices = invoiceRepository.countByStatus(Invoice.InvoiceStatus.PAID);
+
 
         System.out.println("=== SAMPLE DATA STATISTICS ===");
         System.out.println("Total clients: " + totalClients);
         System.out.println("Active clients: " + activeClients);
         System.out.println("Total services: " + totalServices);
         System.out.println("Active services: " + activeServices);
+        System.out.println("Total invoices: " + totalInvoices);
+        System.out.println("Paid invoices: " + paidInvoices);
         System.out.println("================================");
     }
 
@@ -396,4 +421,177 @@ public class DataLoader implements CommandLineRunner {
 
         System.out.println("Sample service assignments created successfully!");
     }
+
+    private void createSampleInvoices() {
+        System.out.println("Creating sample invoices...");
+
+        // Get clients and services
+        List<Client> clients = clientRepository.findAll();
+        List<ClientService> allAssignments = clientServiceRepository.findAll();
+
+        if (clients.isEmpty() || allAssignments.isEmpty()) {
+            System.out.println("No clients or service assignments found. Skipping invoices.");
+            return;
+        }
+
+        // Invoice 1: PAID Invoice for Rajesh Kumar
+        Client rajesh = clients.stream()
+                .filter(c -> "Rajesh Kumar".equals(c.getClientName()))
+                .findFirst()
+                .orElse(clients.get(0));
+
+        Invoice invoice1 = new Invoice();
+        invoice1.setClient(rajesh);
+        invoice1.setInvoiceNumber("INV-2024-0001");
+        invoice1.setInvoiceDate(LocalDate.of(2024, 1, 15));
+        invoice1.setDueDate(LocalDate.of(2024, 1, 30));
+        invoice1.setTaxPercentage(new BigDecimal("18.00"));
+        invoice1.setDiscountPercentage(BigDecimal.ZERO);
+        invoice1.setStatus(Invoice.InvoiceStatus.PAID);
+        invoice1.setPaymentMethod(Invoice.PaymentMethod.BANK_TRANSFER);
+        invoice1.setPaymentReference("TXN123456789");
+        invoice1.setPaymentDate(LocalDate.of(2024, 1, 28));
+
+        // Add items to invoice 1
+        InvoiceItem item1 = new InvoiceItem();
+        item1.setDescription("Income Tax Return Filing - FY 2023-24");
+        item1.setQuantity(BigDecimal.ONE);
+        item1.setUnitPrice(new BigDecimal("2500.00"));
+        item1.setItemOrder(1);
+        item1.calculateAmount();
+        invoice1.addItem(item1);
+
+        InvoiceItem item2 = new InvoiceItem();
+        item2.setDescription("GST Consultation");
+        item2.setQuantity(BigDecimal.ONE);
+        item2.setUnitPrice(new BigDecimal("1500.00"));
+        item2.setItemOrder(2);
+        item2.calculateAmount();
+        invoice1.addItem(item2);
+
+        invoice1.calculateTotals();
+        invoice1.setPaidAmount(invoice1.getTotalAmount()); // Fully paid
+        invoiceRepository.save(invoice1);
+
+        // Invoice 2: SENT Invoice for Priya Sharma
+        Client priya = clients.stream()
+                .filter(c -> "Priya Sharma".equals(c.getClientName()))
+                .findFirst()
+                .orElse(clients.get(1));
+
+        Invoice invoice2 = new Invoice();
+        invoice2.setClient(priya);
+        invoice2.setInvoiceNumber("INV-2024-0002");
+        invoice2.setInvoiceDate(LocalDate.of(2024, 2, 1));
+        invoice2.setDueDate(LocalDate.of(2024, 2, 16));
+        invoice2.setTaxPercentage(new BigDecimal("18.00"));
+        invoice2.setDiscountPercentage(new BigDecimal("5.00")); // 5% discount
+        invoice2.setStatus(Invoice.InvoiceStatus.SENT);
+
+        InvoiceItem item3 = new InvoiceItem();
+        item3.setDescription("GST Registration");
+        item3.setQuantity(BigDecimal.ONE);
+        item3.setUnitPrice(new BigDecimal("3000.00"));
+        item3.setItemOrder(1);
+        item3.calculateAmount();
+        invoice2.addItem(item3);
+
+        invoice2.calculateTotals();
+        invoiceRepository.save(invoice2);
+
+        // Invoice 3: OVERDUE Invoice for Amit Patel
+        Client patel = clients.stream()
+                .filter(c -> c.getClientName().contains("Patel"))
+                .findFirst()
+                .orElse(clients.get(2));
+
+        Invoice invoice3 = new Invoice();
+        invoice3.setClient(patel);
+        invoice3.setInvoiceNumber("INV-2024-0003");
+        invoice3.setInvoiceDate(LocalDate.of(2024, 1, 10));
+        invoice3.setDueDate(LocalDate.of(2024, 1, 25)); // Past due date - OVERDUE
+        invoice3.setTaxPercentage(new BigDecimal("18.00"));
+        invoice3.setDiscountPercentage(BigDecimal.ZERO);
+        invoice3.setStatus(Invoice.InvoiceStatus.OVERDUE);
+
+        InvoiceItem item4 = new InvoiceItem();
+        item4.setDescription("Annual Audit Services");
+        item4.setQuantity(BigDecimal.ONE);
+        item4.setUnitPrice(new BigDecimal("25000.00"));
+        item4.setItemOrder(1);
+        item4.calculateAmount();
+        invoice3.addItem(item4);
+
+        invoice3.calculateTotals();
+        invoiceRepository.save(invoice3);
+
+        // Invoice 4: PARTIALLY PAID Invoice for Sunita Gupta
+        Client sunita = clients.stream()
+                .filter(c -> c.getClientName().contains("Sunita"))
+                .findFirst()
+                .orElse(clients.get(3));
+
+        Invoice invoice4 = new Invoice();
+        invoice4.setClient(sunita);
+        invoice4.setInvoiceNumber("INV-2024-0004");
+        invoice4.setInvoiceDate(LocalDate.of(2024, 2, 10));
+        invoice4.setDueDate(LocalDate.of(2024, 2, 25));
+        invoice4.setTaxPercentage(new BigDecimal("18.00"));
+        invoice4.setDiscountPercentage(BigDecimal.ZERO);
+        invoice4.setStatus(Invoice.InvoiceStatus.PARTIALLY_PAID);
+        invoice4.setPaymentMethod(Invoice.PaymentMethod.UPI);
+        invoice4.setPaymentReference("UPI/234567890");
+        invoice4.setPaymentDate(LocalDate.of(2024, 2, 15));
+
+        InvoiceItem item5 = new InvoiceItem();
+        item5.setDescription("Financial Consulting - 10 Hours");
+        item5.setQuantity(new BigDecimal("10"));
+        item5.setUnitPrice(new BigDecimal("500.00"));
+        item5.setItemOrder(1);
+        item5.calculateAmount();
+        invoice4.addItem(item5);
+
+        InvoiceItem item6 = new InvoiceItem();
+        item6.setDescription("Monthly Bookkeeping");
+        item6.setQuantity(BigDecimal.ONE);
+        item6.setUnitPrice(new BigDecimal("8000.00"));
+        item6.setItemOrder(2);
+        item6.calculateAmount();
+        invoice4.addItem(item6);
+
+        invoice4.calculateTotals();
+        // Partially paid - 50% paid
+        invoice4.setPaidAmount(invoice4.getTotalAmount().divide(new BigDecimal("2")));
+        invoiceRepository.save(invoice4);
+
+        // Invoice 5: DRAFT Invoice for Ramesh Agarwal
+        Client ramesh = clients.stream()
+                .filter(c -> c.getClientName().contains("Ramesh"))
+                .findFirst()
+                .orElse(clients.get(4));
+
+        Invoice invoice5 = new Invoice();
+        invoice5.setClient(ramesh);
+        invoice5.setInvoiceNumber("INV-2024-0005");
+        invoice5.setInvoiceDate(LocalDate.now());
+        invoice5.setDueDate(LocalDate.now().plusDays(15));
+        invoice5.setTaxPercentage(new BigDecimal("18.00"));
+        invoice5.setDiscountPercentage(BigDecimal.ZERO);
+        invoice5.setStatus(Invoice.InvoiceStatus.DRAFT);
+
+        InvoiceItem item7 = new InvoiceItem();
+        item7.setDescription("Monthly Bookkeeping - March 2024");
+        item7.setQuantity(BigDecimal.ONE);
+        item7.setUnitPrice(new BigDecimal("8000.00"));
+        item7.setItemOrder(1);
+        item7.calculateAmount();
+        invoice5.addItem(item7);
+
+        invoice5.calculateTotals();
+        invoiceRepository.save(invoice5);
+
+        System.out.println("Sample invoices created successfully!");
+    }
+
+
 }

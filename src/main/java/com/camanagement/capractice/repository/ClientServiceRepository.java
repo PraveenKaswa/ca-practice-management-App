@@ -63,6 +63,9 @@ public interface ClientServiceRepository extends JpaRepository<ClientService, Lo
     @Query("SELECT cs FROM ClientService cs WHERE cs.status IN ('ASSIGNED', 'IN_PROGRESS') ORDER BY cs.dueDate ASC")
     List<ClientService> findActiveClientServices();
 
+    @Query("SELECT COUNT(cs) FROM ClientService cs WHERE cs.status IN ('ASSIGNED', 'IN_PROGRESS')")
+    long countActiveClientServices();
+
     @Query("SELECT cs FROM ClientService cs WHERE cs.dueDate < :date AND cs.status NOT IN ('COMPLETED', 'CANCELLED') ORDER BY cs.dueDate ASC")
     List<ClientService> findOverdueServices(@Param("date") LocalDate date);
 

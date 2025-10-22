@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.camanagement.capractice.entity.ClientService;
 import com.camanagement.capractice.repository.ClientServiceRepository;
-
+import com.camanagement.capractice.repository.InvoiceRepository;
+import com.camanagement.capractice.entity.Invoice;
+import java.math.BigDecimal;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,6 +26,9 @@ public class DashboardController {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private InvoiceRepository invoiceRepository;
 
     @Autowired
     private ServiceRepository serviceRepository;
@@ -45,6 +50,7 @@ public class DashboardController {
             // OVERDUE TASKS (Real data!)
             LocalDate today = LocalDate.now();
             long overdueTasks = clientServiceRepository.countByDueDateBefore(today);
+            long pendingTasks = clientServiceRepository.countActiveClientServices();
 
             // UPCOMING DEADLINES (Next 7 days)
             LocalDate nextWeek = today.plusDays(7);
@@ -62,11 +68,34 @@ public class DashboardController {
             LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
             long completedThisMonth = clientServiceRepository.countCompletedServicesBetween(startOfMonth, today);
 
+            // Total invoices
+            long totalInvoices = invoiceRepository.count();
+
+            // Invoices by status
+            long paidInvoices = invoiceRepository.countByStatus(Invoice.InvoiceStatus.PAID);
+            long unpaidInvoices = invoiceRepository.countByStatus(Invoice.InvoiceStatus.SENT) +
+                    invoiceRepository.countByStatus(Invoice.InvoiceStatus.PARTIALLY_PAID);
+            long overdueInvoices = invoiceRepository.countOverdueInvoices(today);
+
+            // Financial statistics
+            BigDecimal totalRevenue = invoiceRepository.getTotalRevenue();
+            BigDecimal totalOutstanding = invoiceRepository.getTotalOutstanding();
+            BigDecimal revenueThisMonth = invoiceRepository.getRevenueBetweenDates(startOfMonth, today);
+
+            // Recent invoices
+            List<Invoice> recentInvoices = invoiceRepository.findTop10ByOrderByInvoiceDateDesc();
+            if (recentInvoices.size() > 5) {
+                recentInvoices = recentInvoices.subList(0, 5);
+            }
+
             System.out.println("Dashboard stats calculated:");
             System.out.println("- Total clients: " + totalClients);
             System.out.println("- Active assignments: " + activeAssignments);
             System.out.println("- Overdue tasks: " + overdueTasks);
             System.out.println("- Upcoming deadlines: " + upcomingDeadlines);
+            System.out.println("- Total invoices: " + totalInvoices);
+            System.out.println("- Total revenue: ₹" + totalRevenue);
+            System.out.println("- Total outstanding: ₹" + totalOutstanding);
 
             // ADD TO MODEL
             model.addAttribute("welcomeMessage", "Welcome to CA Practice Management System");
@@ -75,9 +104,20 @@ public class DashboardController {
             model.addAttribute("totalAssignments", totalAssignments);
             model.addAttribute("activeAssignments", activeAssignments);
             model.addAttribute("overdueTasks", overdueTasks);
+            model.addAttribute("pendingTasks", pendingTasks);
             model.addAttribute("upcomingDeadlines", upcomingDeadlines);
             model.addAttribute("completedThisMonth", completedThisMonth);
             model.addAttribute("recentAssignments", recentAssignments);
+
+            // ADD TO MODEL (NEW: invoice attributes)
+            model.addAttribute("totalInvoices", totalInvoices);
+            model.addAttribute("paidInvoices", paidInvoices);
+            model.addAttribute("unpaidInvoices", unpaidInvoices);
+            model.addAttribute("overdueInvoices", overdueInvoices);
+            model.addAttribute("totalRevenue", totalRevenue);
+            model.addAttribute("totalOutstanding", totalOutstanding);
+            model.addAttribute("revenueThisMonth", revenueThisMonth);
+            model.addAttribute("recentInvoices", recentInvoices);
 
             return "dashboard";
 
@@ -92,6 +132,9 @@ public class DashboardController {
             model.addAttribute("activeAssignments", 0);
             model.addAttribute("overdueTasks", 0);
             model.addAttribute("upcomingDeadlines", 0);
+            model.addAttribute("totalInvoices", 0);
+            model.addAttribute("totalRevenue", BigDecimal.ZERO);
+            model.addAttribute("totalOutstanding", BigDecimal.ZERO);
 
             return "dashboard";
         }

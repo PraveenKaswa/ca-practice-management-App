@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Invoice ' + ${invoice.invoiceNumber}">Invoice Details</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background-color: #34495e;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .invoice-actions {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #229954;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .invoice-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .company-details h1 {
+            margin: 0 0 0.5rem 0;
+            color: #2c3e50;
+            font-size: 2rem;
+        }
+
+        .company-details p {
+            margin: 0.25rem 0;
+            color: #7f8c8d;
+        }
+
+        .invoice-meta {
+            text-align: right;
+        }
+
+        .invoice-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        .status-draft {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .status-sent {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .status-partially-paid {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .status-paid {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .status-overdue {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .status-cancelled {
+            background-color: #7f8c8d;
+            color: white;
+        }
+
+        .invoice-parties {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .party-section h3 {
+            color: #2c3e50;
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+        }
+
+        .party-section p {
+            margin: 0.25rem 0;
+            color: #555;
+        }
+
+        .invoice-items {
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+
+        th {
+            background-color: #34495e;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .invoice-totals {
+            margin-left: auto;
+            width: 400px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .total-row.subtotal {
+            font-size: 1.1rem;
+        }
+
+        .total-row.final {
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-top: 2px solid #2c3e50;
+            border-bottom: 2px solid #2c3e50;
+            margin-top: 0.5rem;
+            padding: 1rem 0;
+        }
+
+        .payment-info {
+            background-color: #e8f5e9;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-top: 2rem;
+        }
+
+        .payment-info h4 {
+            margin: 0 0 1rem 0;
+            color: #27ae60;
+        }
+
+        .overdue-warning {
+            background-color: #ffebee;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-top: 2rem;
+            color: #c62828;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        @media print {
+            .header, .invoice-actions, .btn {
+                display: none;
+            }
+            body {
+                background: white;
+            }
+            .invoice-card {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation Header -->
+<div class="header">
+    <div class="logo">CA Practice Management</div>
+    <nav class="nav-menu">
+        <a href="/">Dashboard</a>
+        <a href="/clients">Clients</a>
+        <a href="/services">Services</a>
+        <a href="/invoices">Invoices</a>
+        <a href="/documents">Documents</a>
+        <a href="/reports">Reports</a>
+    </nav>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Success Message -->
+    <div class="success-message" th:if="${param.created}">
+        ✓ Invoice created successfully!
+    </div>
+    <div class="success-message" th:if="${param.payment}">
+        ✓ Payment recorded successfully!
+    </div>
+    <div class="success-message" th:if="${param.sent}">
+        ✓ Invoice marked as sent!
+    </div>
+    <div class="success-message" th:if="${param.cancelled}">
+        ✓ Invoice cancelled successfully!
+    </div>
+
+    <!-- Invoice Actions -->
+    <div class="invoice-actions">
+        <a href="/invoices" class="btn btn-secondary">← Back to Invoices</a>
+
+        <div class="action-group">
+            <button onclick="window.print()" class="btn btn-primary">🖨️ Print</button>
+
+            <form th:if="${invoice.status.name() == 'DRAFT'}"
+                  th:action="@{/invoices/{id}/send(id=${invoice.id})}"
+                  method="post"
+                  style="display: inline;">
+                <button type="submit" class="btn btn-success">Send Invoice</button>
+            </form>
+
+            <a th:if="${invoice.status.name() != 'PAID' and invoice.status.name() != 'CANCELLED'}"
+               th:href="@{/invoices/{id}/payment(id=${invoice.id})}"
+               class="btn btn-primary">Record Payment</a>
+
+            <form th:if="${invoice.status.name() != 'PAID' and invoice.status.name() != 'CANCELLED'}"
+                  th:action="@{/invoices/{id}/cancel(id=${invoice.id})}"
+                  method="post"
+                  style="display: inline;"
+                  onsubmit="return confirm('Are you sure you want to cancel this invoice?')">
+                <button type="submit" class="btn btn-danger">Cancel Invoice</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Invoice Card -->
+    <div class="invoice-card">
+        <!-- Invoice Header -->
+        <div class="invoice-header">
+            <div class="company-details">
+                <h1>CA Practice Management</h1>
+                <p>Chartered Accountants</p>
+                <p>123 Business Street, Gurugram</p>
+                <p>Haryana - 122001</p>
+                <p>Phone: +91 98765 43210</p>
+                <p>Email: info@capractice.com</p>
+            </div>
+
+            <div class="invoice-meta">
+                <div class="invoice-number" th:text="${invoice.invoiceNumber}">INV-2024-0001</div>
+                <span th:class="'status-badge status-' + ${invoice.status.name().toLowerCase().replace('_', '-')}"
+                      th:text="${invoice.status.displayName}">Status</span>
+                <p style="margin-top: 1rem; color: #7f8c8d;">
+                    Date: <strong th:text="${#temporals.format(invoice.invoiceDate, 'dd MMM yyyy')}">01 Jan 2024</strong>
+                </p>
+                <p style="color: #7f8c8d;">
+                    Due: <strong th:text="${#temporals.format(invoice.dueDate, 'dd MMM yyyy')}">15 Jan 2024</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Bill To / From -->
+        <div class="invoice-parties">
+            <div class="party-section">
+                <h3>Bill To:</h3>
+                <p><strong th:text="${client.clientName}">Client Name</strong></p>
+                <p th:if="${client.companyName}" th:text="${client.companyName}">Company Name</p>
+                <p th:text="${client.address}">Address</p>
+                <p>
+                    <span th:text="${client.city}">City</span>,
+                    <span th:text="${client.state}">State</span> -
+                    <span th:text="${client.pincode}">Pincode</span>
+                </p>
+                <p th:if="${client.gstin}">GSTIN: <span th:text="${client.gstin}">GSTIN</span></p>
+                <p th:if="${client.panNumber}">PAN: <span th:text="${client.panNumber}">PAN</span></p>
+            </div>
+
+            <div class="party-section">
+                <h3>Payment Details:</h3>
+                <p>Bank: HDFC Bank</p>
+                <p>Account No: 1234567890</p>
+                <p>IFSC: HDFC0001234</p>
+                <p>UPI: capractice@hdfc</p>
+            </div>
+        </div>
+
+        <!-- Invoice Items -->
+        <div class="invoice-items">
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Description</th>
+                    <th class="text-right">Qty</th>
+                    <th class="text-right">Rate</th>
+                    <th class="text-right">Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item, stat : ${items}">
+                    <td th:text="${stat.count}">1</td>
+                    <td th:text="${item.description}">Service Description</td>
+                    <td class="text-right" th:text="${item.quantity}">1</td>
+                    <td class="text-right" th:text="'₹' + ${#numbers.formatDecimal(item.unitPrice, 1, 2)}">₹0</td>
+                    <td class="text-right" th:text="'₹' + ${#numbers.formatDecimal(item.amount, 1, 2)}">₹0</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Invoice Totals -->
+        <div class="invoice-totals">
+            <div class="total-row subtotal">
+                <span>Subtotal:</span>
+                <span th:text="'₹' + ${#numbers.formatDecimal(invoice.subtotal, 1, 2)}">₹0</span>
+            </div>
+
+            <div class="total-row" th:if="${invoice.discountAmount != null and invoice.discountAmount > 0}">
+                <span>
+                    Discount
+                    <span th:if="${invoice.discountPercentage != null}"
+                          th:text="'(' + ${invoice.discountPercentage} + '%)'"></span>:
+                </span>
+                <span th:text="'- ₹' + ${#numbers.formatDecimal(invoice.discountAmount, 1, 2)}">₹0</span>
+            </div>
+
+            <div class="total-row">
+                <span>
+                    GST
+                    <span th:if="${invoice.taxPercentage != null}"
+                          th:text="'(' + ${invoice.taxPercentage} + '%)'"></span>:
+                </span>
+                <span th:text="'₹' + ${#numbers.formatDecimal(invoice.taxAmount, 1, 2)}">₹0</span>
+            </div>
+
+            <div class="total-row final">
+                <span>Total Amount:</span>
+                <span th:text="'₹' + ${#numbers.formatDecimal(invoice.totalAmount, 1, 2)}">₹0</span>
+            </div>
+
+            <div class="total-row" th:if="${invoice.paidAmount != null and invoice.paidAmount > 0}">
+                <span>Paid Amount:</span>
+                <span style="color: #27ae60;" th:text="'₹' + ${#numbers.formatDecimal(invoice.paidAmount, 1, 2)}">₹0</span>
+            </div>
+
+            <div class="total-row final" th:if="${outstandingAmount != null and outstandingAmount > 0}">
+                <span>Outstanding:</span>
+                <span style="color: #e74c3c;" th:text="'₹' + ${#numbers.formatDecimal(outstandingAmount, 1, 2)}">₹0</span>
+            </div>
+        </div>
+
+        <!-- Payment Information -->
+        <div class="payment-info" th:if="${invoice.status.name() == 'PAID'}">
+            <h4>✓ Payment Received</h4>
+            <p>Amount Paid: <strong th:text="'₹' + ${#numbers.formatDecimal(invoice.paidAmount, 1, 2)}">₹0</strong></p>
+            <p>Payment Method: <strong th:text="${invoice.paymentMethod.displayName}">Method</strong></p>
+            <p th:if="${invoice.paymentReference}">
+                Reference: <strong th:text="${invoice.paymentReference}">Reference</strong>
+            </p>
+            <p>Payment Date: <strong th:text="${#temporals.format(invoice.paymentDate, 'dd MMM yyyy')}">Date</strong></p>
+        </div>
+
+        <!-- Overdue Warning -->
+        <div class="overdue-warning" th:if="${isOverdue}">
+            <strong>⚠️ OVERDUE INVOICE</strong>
+            <p>This invoice is overdue. Please make payment immediately.</p>
+        </div>
+
+        <!-- Notes -->
+        <div th:if="${invoice.notes}" style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #ecf0f1;">
+            <h4 style="color: #2c3e50; margin-bottom: 0.5rem;">Notes:</h4>
+            <p style="color: #555;" th:text="${invoice.notes}">Notes</p>
+        </div>
+
+        <!-- Terms & Conditions -->
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #ecf0f1;">
+            <h4 style="color: #2c3e50; margin-bottom: 0.5rem;">Terms & Conditions:</h4>
+            <p style="color: #555; font-size: 0.9rem;">
+                1. Payment is due within the specified due date.<br>
+                2. Late payments may incur additional charges.<br>
+                3. All disputes subject to Gurugram jurisdiction only.
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

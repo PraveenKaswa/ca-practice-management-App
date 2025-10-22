@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Invoice - CA Practice Management</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background-color: #34495e;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            color: #2c3e50;
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+        }
+
+        .page-subtitle {
+            color: #7f8c8d;
+            margin: 0;
+        }
+
+        .form-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            margin: 0 0 1.5rem 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .services-list {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .service-item {
+            padding: 1rem;
+            border: 1px solid #ecf0f1;
+            border-radius: 4px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .service-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .service-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .service-details {
+            flex: 1;
+        }
+
+        .service-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .service-meta {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .service-price {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #27ae60;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .error-message {
+            background-color: #fee;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .help-text {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 0.25rem;
+        }
+
+        .empty-services {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation Header -->
+<div class="header">
+    <div class="logo">CA Practice Management</div>
+    <nav class="nav-menu">
+        <a href="/">Dashboard</a>
+        <a href="/clients">Clients</a>
+        <a href="/services">Services</a>
+        <a href="/invoices">Invoices</a>
+        <a href="/documents">Documents</a>
+        <a href="/reports">Reports</a>
+    </nav>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Create Invoice</h1>
+        <p class="page-subtitle">Generate invoice for completed services</p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" th:if="${error}">
+        <strong>Error:</strong> <span th:text="${error}">Error message</span>
+    </div>
+
+    <!-- Create Invoice Form -->
+    <div class="form-card">
+        <form method="post" action="/invoices/create">
+
+            <!-- Client Selection -->
+            <div class="form-section">
+                <h3 class="section-title">1. Select Client</h3>
+
+                <div class="form-group">
+                    <label>Client <span class="required">*</span></label>
+                    <select name="clientId" id="clientSelect" required onchange="loadClientServices(this.value)">
+                        <option value="">-- Select Client --</option>
+                        <option th:each="client : ${allClients}"
+                                th:value="${client.id}"
+                                th:text="${client.clientName}"
+                                th:selected="${selectedClient != null and selectedClient.id == client.id}">
+                            Client Name
+                        </option>
+                    </select>
+                    <p class="help-text">Select the client to invoice</p>
+                </div>
+            </div>
+
+            <!-- Service Selection -->
+            <div class="form-section" id="servicesSection" th:if="${completedServices != null and !completedServices.empty}">
+                <h3 class="section-title">2. Select Services to Invoice</h3>
+
+                <div class="services-list">
+                    <div th:each="service : ${completedServices}" class="service-item">
+                        <input type="checkbox"
+                               name="serviceIds"
+                               th:value="${service.id}"
+                               th:id="'service-' + ${service.id}">
+                        <div class="service-details">
+                            <div class="service-name" th:text="${service.service.serviceName}">Service Name</div>
+                            <div class="service-meta">
+                                Completed: <span th:text="${#temporals.format(service.completionDate, 'dd MMM yyyy')}">Date</span>
+                            </div>
+                        </div>
+                        <div class="service-price" th:text="'₹' + ${#numbers.formatDecimal(service.quotedPrice, 1, 2)}">₹0</div>
+                    </div>
+                </div>
+
+                <p class="help-text">Select one or more completed services to include in this invoice</p>
+            </div>
+
+            <!-- Empty State -->
+            <div class="form-section" th:if="${selectedClient != null and (completedServices == null or completedServices.empty)}">
+                <div class="empty-services">
+                    <h3>No Completed Services Found</h3>
+                    <p>This client doesn't have any completed services to invoice yet.</p>
+                    <a th:href="@{/clients/{id}/services(id=${selectedClient.id})}" class="btn btn-primary">
+                        View Client Services
+                    </a>
+                </div>
+            </div>
+
+            <!-- Invoice Settings -->
+            <div class="form-section" th:if="${completedServices != null and !completedServices.empty}">
+                <h3 class="section-title">3. Invoice Settings</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tax Percentage (GST %)</label>
+                        <input type="number"
+                               name="taxPercentage"
+                               step="0.01"
+                               min="0"
+                               max="100"
+                               th:value="${defaultTaxRate}"
+                               placeholder="18.00">
+                        <p class="help-text">Default: 18% GST</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Discount Percentage (%)</label>
+                        <input type="number"
+                               name="discountPercentage"
+                               step="0.01"
+                               min="0"
+                               max="100"
+                               value="0"
+                               placeholder="0.00">
+                        <p class="help-text">Optional discount</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Terms (Days)</label>
+                    <input type="number"
+                           name="paymentTermDays"
+                           min="1"
+                           max="365"
+                           th:value="${defaultPaymentTerms}"
+                           placeholder="15">
+                    <p class="help-text">Days until payment is due (default: 15 days)</p>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions" th:if="${completedServices != null and !completedServices.empty}">
+                <a href="/invoices" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Create Invoice</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function loadClientServices(clientId) {
+        if (clientId) {
+            // Redirect to same page with clientId parameter
+            window.location.href = '/invoices/create?clientId=' + clientId;
+        }
+    }
+</script>
+</body>
+</html>

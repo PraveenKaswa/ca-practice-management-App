@@ -124,6 +124,91 @@
             color: white;
             text-decoration: none;
         }
+
+        .activity-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid #ecf0f1;
+        border-radius: 6px;
+        margin-bottom: 0.75rem;
+        background: white;
+        transition: background-color 0.3s;
+    }
+
+    .activity-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .activity-info {
+        flex: 1;
+        color: #2c3e50;
+    }
+
+    .activity-info a {
+        color: #3498db;
+        text-decoration: none;
+    }
+
+    .activity-info a:hover {
+        text-decoration: underline;
+    }
+
+    .activity-meta {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .status-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-draft {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+    .status-sent {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .status-partially-paid {
+        background-color: #f39c12;
+        color: white;
+    }
+
+    .status-paid {
+        background-color: #27ae60;
+        color: white;
+    }
+
+    .status-overdue {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    .status-cancelled {
+        background-color: #7f8c8d;
+        color: white;
+    }
+
+    .recent-activities {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .activity-list {
+        margin-top: 1rem;
+    }
     </style>
 </head>
 <body>
@@ -134,6 +219,7 @@
         <a href="/">Dashboard</a>
         <a href="/clients">Clients</a>
         <a href="/services">Services</a>
+        <a href="/invoices">Invoices</a>
         <a href="/documents">Documents</a>
         <a href="/reports">Reports</a>
         <a href="/about">About</a>
@@ -174,38 +260,6 @@
     </div>
 
 
-    <!-- Recent Activities Section -->
-    <div class="recent-activities" th:if="${recentAssignments != null and !recentAssignments.empty}">
-        <h3 class="actions-title">Recent Service Assignments</h3>
-        <div class="activity-list">
-            <div th:each="assignment : ${recentAssignments}" class="activity-item">
-                <div class="activity-info">
-                    <strong th:text="${assignment.service.serviceName}">Service Name</strong>
-                    assigned to
-                    <a th:href="@{/clients/{id}/view(id=${assignment.client.id})}"
-                       th:text="${assignment.client.clientName}">Client Name</a>
-                </div>
-                <div class="activity-meta">
-                    <span th:text="${#temporals.format(assignment.assignedDate, 'dd MMM')}">Date</span>
-                    <span th:class="'status-badge status-' + ${assignment.status.name().toLowerCase().replace('_', '-')}"
-                          th:text="${assignment.status.displayName}">Status</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-        <h3 class="actions-title">Quick Actions</h3>
-        <div class="action-buttons">
-            <a href="/clients/new" class="action-btn">Add New Client</a>
-            <a href="/services/new" class="action-btn">Create Service</a>
-            <a href="/documents/upload" class="action-btn">Upload Document</a>
-            <a href="/reports/generate" class="action-btn">Generate Report</a>
-        </div>
-    </div>
-</div>
-
 <!-- Statistics Cards -->
 <div class="stats-grid">
     <div class="stat-card">
@@ -235,6 +289,18 @@
     </div>
 </div>
 
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h3 class="actions-title">Quick Actions</h3>
+        <div class="action-buttons">
+            <a href="/clients/new" class="action-btn">Add New Client</a>
+            <a href="/services/new" class="action-btn">Create Service</a>
+            <a href="/documents/upload" class="action-btn">Upload Document</a>
+            <a href="/reports/generate" class="action-btn">Generate Report</a>
+        </div>
+    </div>
+</div>
+
 <!-- Recent Activities Section -->
 <div class="recent-activities" th:if="${recentAssignments != null and !recentAssignments.empty}">
     <h3 class="actions-title">Recent Service Assignments</h3>
@@ -252,6 +318,82 @@
                       th:text="${assignment.status.displayName}">Status</span>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Invoice & Financial Statistics -->
+<div style="margin-top: 3rem;">
+    <h3 class="actions-title">💰 Financial Overview</h3>
+    <div class="stats-grid">
+        <div class="stat-card" style="border-left-color: #27ae60;">
+            <h2 class="stat-number" style="color: #27ae60;"
+                th:text="'₹' + ${#numbers.formatDecimal(totalRevenue, 1, 2)}">₹0</h2>
+            <p class="stat-label">Total Revenue</p>
+        </div>
+
+        <div class="stat-card" style="border-left-color: #e74c3c;">
+            <h2 class="stat-number" style="color: #e74c3c;"
+                th:text="'₹' + ${#numbers.formatDecimal(totalOutstanding, 1, 2)}">₹0</h2>
+            <p class="stat-label">Outstanding Amount</p>
+        </div>
+
+        <div class="stat-card" style="border-left-color: #3498db;">
+            <h2 class="stat-number" style="color: #3498db;"
+                th:text="'₹' + ${#numbers.formatDecimal(revenueThisMonth, 1, 2)}">₹0</h2>
+            <p class="stat-label">Revenue This Month</p>
+        </div>
+
+        <div class="stat-card">
+            <a href="/invoices" style="text-decoration: none; color: inherit;">
+                <h2 class="stat-number" th:text="${totalInvoices}">0</h2>
+                <p class="stat-label">Total Invoices</p>
+            </a>
+        </div>
+
+        <div class="stat-card" style="border-left-color: #27ae60;">
+            <a href="/invoices?status=PAID" style="text-decoration: none; color: inherit;">
+                <h2 class="stat-number" style="color: #27ae60;" th:text="${paidInvoices}">0</h2>
+                <p class="stat-label">Paid Invoices</p>
+            </a>
+        </div>
+
+        <div class="stat-card" style="border-left-color: #f39c12;">
+            <a href="/invoices?status=SENT" style="text-decoration: none; color: inherit;">
+                <h2 class="stat-number" style="color: #f39c12;" th:text="${unpaidInvoices}">0</h2>
+                <p class="stat-label">Unpaid Invoices</p>
+            </a>
+        </div>
+
+        <div class="stat-card" style="border-left-color: #e74c3c;">
+            <a href="/invoices?status=OVERDUE" style="text-decoration: none; color: inherit;">
+                <h2 class="stat-number" style="color: #e74c3c;" th:text="${overdueInvoices}">0</h2>
+                <p class="stat-label">Overdue Invoices</p>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Invoices Section -->
+<div class="recent-activities" style="margin-top: 2rem;" th:if="${recentInvoices != null and !recentInvoices.empty}">
+    <h3 class="actions-title">📄 Recent Invoices</h3>
+    <div class="activity-list">
+        <div th:each="invoice : ${recentInvoices}" class="activity-item">
+            <div class="activity-info">
+                <strong th:text="${invoice.invoiceNumber}">INV-2024-0001</strong>
+                for
+                <a th:href="@{/clients/{id}/view(id=${invoice.client.id})}"
+                   th:text="${invoice.client.clientName}">Client Name</a>
+                - <span th:text="'₹' + ${#numbers.formatDecimal(invoice.totalAmount, 1, 2)}">₹0</span>
+            </div>
+            <div class="activity-meta">
+                <span th:text="${#temporals.format(invoice.invoiceDate, 'dd MMM')}">Date</span>
+                <span th:class="'status-badge status-' + ${invoice.status.name().toLowerCase().replace('_', '-')}"
+                      th:text="${invoice.status.displayName}">Status</span>
+            </div>
+        </div>
+    </div>
+    <div style="text-align: center; margin-top: 1rem;">
+        <a href="/invoices" class="action-btn">View All Invoices →</a>
     </div>
 </div>
 

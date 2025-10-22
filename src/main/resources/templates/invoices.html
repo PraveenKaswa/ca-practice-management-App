@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoices - CA Practice Management</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background-color: #34495e;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 4px solid #3498db;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+            margin: 0;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            margin: 0.5rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .filters-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .filters-title {
+            color: #2c3e50;
+            margin: 0 0 1rem 0;
+        }
+
+        .filters-form {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            color: #555;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group select,
+        .form-group input {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .invoices-table {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #34495e;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-draft {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .status-sent {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .status-partially-paid {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .status-paid {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .status-overdue {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .status-cancelled {
+            background-color: #7f8c8d;
+            color: white;
+        }
+
+        .action-links {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-links a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .action-links a:hover {
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+        }
+
+        .amount {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .overdue-indicator {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation Header -->
+<div class="header">
+    <div class="logo">CA Practice Management</div>
+    <nav class="nav-menu">
+        <a href="/">Dashboard</a>
+        <a href="/clients">Clients</a>
+        <a href="/services">Services</a>
+        <a href="/invoices">Invoices</a>
+        <a href="/documents">Documents</a>
+        <a href="/reports">Reports</a>
+        <a href="/about">About</a>
+    </nav>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Invoices</h1>
+        <a href="/invoices/create" class="btn btn-primary">+ Create Invoice</a>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h2 class="stat-number" th:text="${stats.totalInvoices}">0</h2>
+            <p class="stat-label">Total Invoices</p>
+        </div>
+
+        <div class="stat-card">
+            <h2 class="stat-number" style="color: #27ae60;" th:text="${stats.paidInvoices}">0</h2>
+            <p class="stat-label">Paid Invoices</p>
+        </div>
+
+        <div class="stat-card">
+            <h2 class="stat-number" style="color: #f39c12;" th:text="${stats.unpaidInvoices}">0</h2>
+            <p class="stat-label">Unpaid Invoices</p>
+        </div>
+
+        <div class="stat-card">
+            <h2 class="stat-number" style="color: #e74c3c;" th:text="${stats.overdueInvoices}">0</h2>
+            <p class="stat-label">Overdue Invoices</p>
+        </div>
+
+        <div class="stat-card">
+            <h2 class="stat-number" style="color: #27ae60;" th:text="'₹' + ${#numbers.formatDecimal(stats.totalRevenue, 1, 2)}">₹0</h2>
+            <p class="stat-label">Total Revenue</p>
+        </div>
+
+        <div class="stat-card">
+            <h2 class="stat-number" style="color: #e74c3c;" th:text="'₹' + ${#numbers.formatDecimal(stats.totalOutstanding, 1, 2)}">₹0</h2>
+            <p class="stat-label">Total Outstanding</p>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <h3 class="filters-title">Filter Invoices</h3>
+        <form class="filters-form" method="get" action="/invoices">
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status">
+                    <option value="ALL">All Statuses</option>
+                    <option value="DRAFT" th:selected="${selectedStatus == 'DRAFT'}">Draft</option>
+                    <option value="SENT" th:selected="${selectedStatus == 'SENT'}">Sent</option>
+                    <option value="PARTIALLY_PAID" th:selected="${selectedStatus == 'PARTIALLY_PAID'}">Partially Paid</option>
+                    <option value="PAID" th:selected="${selectedStatus == 'PAID'}">Paid</option>
+                    <option value="OVERDUE" th:selected="${selectedStatus == 'OVERDUE'}">Overdue</option>
+                    <option value="CANCELLED" th:selected="${selectedStatus == 'CANCELLED'}">Cancelled</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Client</label>
+                <select name="clientId">
+                    <option value="">All Clients</option>
+                    <option th:each="client : ${allClients}"
+                            th:value="${client.id}"
+                            th:text="${client.clientName}"
+                            th:selected="${selectedClientId == client.id}">Client</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a href="/invoices" class="btn" style="background-color: #95a5a6; color: white;">Clear</a>
+        </form>
+    </div>
+
+    <!-- Invoices Table -->
+    <div class="invoices-table">
+        <table th:if="${invoices != null and !invoices.empty}">
+            <thead>
+            <tr>
+                <th>Invoice No.</th>
+                <th>Client</th>
+                <th>Invoice Date</th>
+                <th>Due Date</th>
+                <th>Amount</th>
+                <th>Paid</th>
+                <th>Outstanding</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="invoice : ${invoices}">
+                <td>
+                    <strong th:text="${invoice.invoiceNumber}">INV-2024-0001</strong>
+                </td>
+                <td th:text="${invoice.client.clientName}">Client Name</td>
+                <td th:text="${#temporals.format(invoice.invoiceDate, 'dd MMM yyyy')}">01 Jan 2024</td>
+                <td>
+                    <span th:text="${#temporals.format(invoice.dueDate, 'dd MMM yyyy')}">15 Jan 2024</span>
+                    <span th:if="${invoice.overdue}" class="overdue-indicator"> (OVERDUE)</span>
+                </td>
+                <td class="amount" th:text="'₹' + ${#numbers.formatDecimal(invoice.totalAmount, 1, 2)}">₹5,000</td>
+                <td th:text="'₹' + ${#numbers.formatDecimal(invoice.paidAmount, 1, 2)}">₹0</td>
+                <td class="amount" th:text="'₹' + ${#numbers.formatDecimal(invoice.outstandingAmount, 1, 2)}">₹5,000</td>
+                <td>
+                    <span th:class="'status-badge status-' + ${invoice.status.name().toLowerCase().replace('_', '-')}"
+                          th:text="${invoice.status.displayName}">Status</span>
+                </td>
+                <td>
+                    <div class="action-links">
+                        <a th:href="@{/invoices/{id}/view(id=${invoice.id})}">View</a>
+                        <a th:href="@{/invoices/{id}/payment(id=${invoice.id})}"
+                           th:if="${invoice.status != T(com.camanagement.capractice.entity.Invoice.InvoiceStatus).PAID and invoice.status != T(com.camanagement.capractice.entity.Invoice.InvoiceStatus).CANCELLED}">
+                            Payment
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="empty-state" th:if="${invoices == null or invoices.empty}">
+            <h3>No invoices found</h3>
+            <p>Create your first invoice to get started</p>
+            <a href="/invoices/create" class="btn btn-primary">Create Invoice</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
