@@ -266,6 +266,7 @@
     <!-- Create Invoice Form -->
     <div class="form-card">
         <form method="post" action="/invoices/create">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
             <!-- Client Selection -->
             <div class="form-section">
