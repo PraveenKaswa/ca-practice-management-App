@@ -43,12 +43,8 @@
             background-color: #34495e;
         }
 
-        .nav-menu a.active {
-            background-color: #34495e;
-        }
-
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 2rem auto;
             padding: 0 2rem;
         }
@@ -70,9 +66,7 @@
             font-size: 2rem;
         }
 
-        .upload-btn {
-            background-color: #27ae60;
-            color: white;
+        .btn {
             padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 6px;
@@ -80,214 +74,22 @@
             text-decoration: none;
             display: inline-block;
             transition: background-color 0.3s;
+            font-size: 1rem;
         }
 
-        .upload-btn:hover {
-            background-color: #229954;
-            text-decoration: none;
-            color: white;
-        }
-
-        .upload-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-            text-align: center;
-            border: 2px dashed #3498db;
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            color: #3498db;
-            margin-bottom: 1rem;
-        }
-
-        .upload-text {
-            color: #5d6d7e;
-            margin-bottom: 1rem;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .file-input-label {
+        .btn-primary {
             background-color: #3498db;
             color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            display: inline-block;
-            transition: background-color 0.3s;
         }
 
-        .file-input-label:hover {
+        .btn-primary:hover {
             background-color: #2980b9;
         }
 
-        .filter-section {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-
-        .filter-row {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .search-input {
-            flex: 1;
-            min-width: 250px;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        .filter-select {
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            min-width: 120px;
-        }
-
-        .search-btn {
-            background-color: #3498db;
-            color: white;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .documents-table {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .table th {
-            background-color: #34495e;
-            color: white;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        .table td {
-            padding: 1rem;
-            border-bottom: 1px solid #eee;
-            vertical-align: middle;
-        }
-
-        .table tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .file-icon {
-            width: 24px;
-            height: 24px;
-            margin-right: 0.5rem;
-            vertical-align: middle;
-        }
-
-        .file-name {
-            display: flex;
-            align-items: center;
-        }
-
-        .file-size {
-            color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-
-        .document-type {
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .type-tax {
-            background-color: #e8f5e8;
-            color: #2d5016;
-        }
-
-        .type-audit {
-            background-color: #e3f2fd;
-            color: #0d47a1;
-        }
-
-        .type-compliance {
-            background-color: #fff3e0;
-            color: #e65100;
-        }
-
-        .type-other {
-            background-color: #f3e5f5;
-            color: #4a148c;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn-small {
-            padding: 0.25rem 0.5rem;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 0.8rem;
-        }
-
-        .btn-download {
-            background-color: #3498db;
-            color: white;
-        }
-
-        .btn-view {
-            background-color: #17a2b8;
-            color: white;
-        }
-
-        .btn-delete {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        .client-link {
-            color: #3498db;
-            text-decoration: none;
-        }
-
-        .client-link:hover {
-            text-decoration: underline;
-        }
-
-        .no-documents {
-            text-align: center;
-            padding: 3rem;
-            color: #7f8c8d;
-        }
-
-        .stats-row {
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
+            gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
@@ -297,6 +99,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             text-align: center;
+            border-left: 4px solid #3498db;
         }
 
         .stat-number {
@@ -311,6 +114,144 @@
             margin: 0.5rem 0 0 0;
             font-size: 0.9rem;
         }
+
+        .filters-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .filters-form {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            color: #555;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group select,
+        .form-group input {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .document-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .document-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .document-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .document-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            word-break: break-word;
+        }
+
+        .document-meta {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin: 0.25rem 0;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .category-tax { background-color: #3498db; color: white; }
+        .category-audit { background-color: #9b59b6; color: white; }
+        .category-compliance { background-color: #e74c3c; color: white; }
+        .category-financial { background-color: #27ae60; color: white; }
+        .category-contracts { background-color: #f39c12; color: white; }
+        .category-identity { background-color: #1abc9c; color: white; }
+        .category-correspondence { background-color: #95a5a6; color: white; }
+        .category-general { background-color: #34495e; color: white; }
+
+        .document-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #229954;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
@@ -321,10 +262,10 @@
         <a href="/">Dashboard</a>
         <a href="/clients">Clients</a>
         <a href="/services">Services</a>
-        <a href="/documents" class="active">Documents</a>
+        <a href="/invoices">Invoices</a>
+        <a href="/documents">Documents</a>
         <a href="/reports">Reports</a>
         <a href="/about">About</a>
-        <a href="/logout">Logout</a>
     </nav>
 </div>
 
@@ -332,185 +273,127 @@
 <div class="container">
     <!-- Page Header -->
     <div class="page-header">
-        <h1 class="page-title">Document Management</h1>
-        <a href="/documents/upload" class="upload-btn">📁 Upload Documents</a>
+        <h1 class="page-title">📄 Documents</h1>
+        <a href="/documents/upload" class="btn btn-primary">📤 Upload Document</a>
     </div>
 
-    <!-- Document Statistics -->
-    <div class="stats-row">
+    <!-- Success Message -->
+    <div class="success-message" th:if="${param.uploaded}">
+        ✓ Document uploaded successfully!
+    </div>
+    <div class="success-message" th:if="${param.deleted}">
+        ✓ Document deleted successfully!
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
         <div class="stat-card">
-            <h3 class="stat-number">156</h3>
+            <h2 class="stat-number" th:text="${stats.totalDocuments}">0</h2>
             <p class="stat-label">Total Documents</p>
         </div>
-        <div class="stat-card">
-            <h3 class="stat-number">2.4 GB</h3>
-            <p class="stat-label">Storage Used</p>
-        </div>
-        <div class="stat-card">
-            <h3 class="stat-number">23</h3>
-            <p class="stat-label">This Month</p>
-        </div>
-        <div class="stat-card">
-            <h3 class="stat-number">8</h3>
-            <p class="stat-label">Pending Review</p>
-        </div>
-    </div>
 
-    <!-- Upload Section -->
-    <div class="upload-section">
-        <div class="upload-icon">📄</div>
-        <p class="upload-text">Drag and drop files here or click to browse</p>
-        <input type="file" id="file-upload" class="file-input" multiple>
-        <label for="file-upload" class="file-input-label">Choose Files</label>
-    </div>
+        <div class="stat-card" style="border-left-color: #3498db;">
+            <h2 class="stat-number" style="color: #3498db;" th:text="${stats.taxDocuments}">0</h2>
+            <p class="stat-label">Tax Documents</p>
+        </div>
 
-    <!-- Search and Filter Section -->
-    <div class="filter-section">
-        <div class="filter-row">
-            <input type="text" class="search-input" placeholder="Search documents by name, client, or type...">
-            <select class="filter-select">
-                <option value="">All Clients</option>
-                <option value="kumar">Kumar Enterprises</option>
-                <option value="priya">Priya Sharma</option>
-                <option value="patel">Patel & Associates</option>
-            </select>
-            <select class="filter-select">
-                <option value="">All Types</option>
-                <option value="tax">Tax Documents</option>
-                <option value="audit">Audit Reports</option>
-                <option value="compliance">Compliance</option>
-                <option value="other">Other</option>
-            </select>
-            <select class="filter-select">
-                <option value="">All Time</option>
-                <option value="today">Today</option>
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-            </select>
-            <button class="search-btn">Search</button>
+        <div class="stat-card" style="border-left-color: #9b59b6;">
+            <h2 class="stat-number" style="color: #9b59b6;" th:text="${stats.auditDocuments}">0</h2>
+            <p class="stat-label">Audit Documents</p>
+        </div>
+
+        <div class="stat-card" style="border-left-color: #e74c3c;">
+            <h2 class="stat-number" style="color: #e74c3c;" th:text="${stats.complianceDocuments}">0</h2>
+            <p class="stat-label">Compliance Documents</p>
         </div>
     </div>
 
-    <!-- Documents Table -->
-    <div class="documents-table">
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Document Name</th>
-                <th>Client</th>
-                <th>Type</th>
-                <th>Size</th>
-                <th>Upload Date</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- Sample Document 1 -->
-            <tr>
-                <td>
-                    <div class="file-name">
-                        <span class="file-icon">📄</span>
-                        ITR-1_2023-24_RajeshKumar.pdf
-                    </div>
-                </td>
-                <td><a href="/clients/1" class="client-link">Kumar Enterprises</a></td>
-                <td><span class="document-type type-tax">Tax Documents</span></td>
-                <td><span class="file-size">2.4 MB</span></td>
-                <td>15-Mar-2024</td>
-                <td>
-                    <div class="action-buttons">
-                        <a href="/documents/1/view" class="btn-small btn-view">View</a>
-                        <a href="/documents/1/download" class="btn-small btn-download">Download</a>
-                        <a href="/documents/1/delete" class="btn-small btn-delete" onclick="return confirm('Are you sure?')">Delete</a>
-                    </div>
-                </td>
-            </tr>
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <form class="filters-form" method="get" action="/documents">
+            <div class="form-group">
+                <label>Client</label>
+                <select name="clientId">
+                    <option value="">All Clients</option>
+                    <option th:each="client : ${allClients}"
+                            th:value="${client.id}"
+                            th:text="${client.clientName}"
+                            th:selected="${selectedClientId == client.id}">Client</option>
+                </select>
+            </div>
 
-            <!-- Sample Document 2 -->
-            <tr>
-                <td>
-                    <div class="file-name">
-                        <span class="file-icon">📊</span>
-                        Annual_Audit_Report_2023.xlsx
-                    </div>
-                </td>
-                <td><a href="/clients/3" class="client-link">Patel & Associates</a></td>
-                <td><span class="document-type type-audit">Audit Reports</span></td>
-                <td><span class="file-size">5.2 MB</span></td>
-                <td>12-Mar-2024</td>
-                <td>
-                    <div class="action-buttons">
-                        <a href="/documents/2/view" class="btn-small btn-view">View</a>
-                        <a href="/documents/2/download" class="btn-small btn-download">Download</a>
-                        <a href="/documents/2/delete" class="btn-small btn-delete" onclick="return confirm('Are you sure?')">Delete</a>
-                    </div>
-                </td>
-            </tr>
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category">
+                    <option value="">All Categories</option>
+                    <option th:each="cat : ${categories}"
+                            th:value="${cat.name()}"
+                            th:text="${cat.displayName}"
+                            th:selected="${selectedCategory == cat.name()}">Category</option>
+                </select>
+            </div>
 
-            <!-- Sample Document 3 -->
-            <tr>
-                <td>
-                    <div class="file-name">
-                        <span class="file-icon">📋</span>
-                        GST_Return_Feb2024.pdf
-                    </div>
-                </td>
-                <td><a href="/clients/2" class="client-link">Priya Sharma</a></td>
-                <td><span class="document-type type-compliance">Compliance</span></td>
-                <td><span class="file-size">1.8 MB</span></td>
-                <td>10-Mar-2024</td>
-                <td>
-                    <div class="action-buttons">
-                        <a href="/documents/3/view" class="btn-small btn-view">View</a>
-                        <a href="/documents/3/download" class="btn-small btn-download">Download</a>
-                        <a href="/documents/3/delete" class="btn-small btn-delete" onclick="return confirm('Are you sure?')">Delete</a>
-                    </div>
-                </td>
-            </tr>
+            <div class="form-group">
+                <label>Search</label>
+                <input type="text"
+                       name="search"
+                       placeholder="Search by filename..."
+                       th:value="${searchTerm}">
+            </div>
 
-            <!-- Sample Document 4 -->
-            <tr>
-                <td>
-                    <div class="file-name">
-                        <span class="file-icon">📄</span>
-                        PAN_Card_Copy.jpg
-                    </div>
-                </td>
-                <td><a href="/clients/1" class="client-link">Kumar Enterprises</a></td>
-                <td><span class="document-type type-other">Other</span></td>
-                <td><span class="file-size">890 KB</span></td>
-                <td>08-Mar-2024</td>
-                <td>
-                    <div class="action-buttons">
-                        <a href="/documents/4/view" class="btn-small btn-view">View</a>
-                        <a href="/documents/4/download" class="btn-small btn-download">Download</a>
-                        <a href="/documents/4/delete" class="btn-small btn-delete" onclick="return confirm('Are you sure?')">Delete</a>
-                    </div>
-                </td>
-            </tr>
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a href="/documents" class="btn" style="background-color: #95a5a6; color: white;">Clear</a>
+        </form>
+    </div>
 
-            <!-- Sample Document 5 -->
-            <tr>
-                <td>
-                    <div class="file-name">
-                        <span class="file-icon">📊</span>
-                        Balance_Sheet_2023.pdf
-                    </div>
-                </td>
-                <td><a href="/clients/3" class="client-link">Patel & Associates</a></td>
-                <td><span class="document-type type-audit">Audit Reports</span></td>
-                <td><span class="file-size">3.1 MB</span></td>
-                <td>05-Mar-2024</td>
-                <td>
-                    <div class="action-buttons">
-                        <a href="/documents/5/view" class="btn-small btn-view">View</a>
-                        <a href="/documents/5/download" class="btn-small btn-download">Download</a>
-                        <a href="/documents/5/delete" class="btn-small btn-delete" onclick="return confirm('Are you sure?')">Delete</a>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+    <!-- Documents Grid -->
+    <div class="documents-grid" th:if="${documents != null and !documents.empty}">
+        <div th:each="doc : ${documents}" class="document-card">
+            <!-- File Icon -->
+            <div class="document-icon">
+                <span th:if="${doc.isPdf()}">📄</span>
+                <span th:if="${doc.isExcel()}">📊</span>
+                <span th:if="${doc.isImage()}">🖼️</span>
+                <span th:if="${!doc.isPdf() and !doc.isExcel() and !doc.isImage()}">📎</span>
+            </div>
+
+            <!-- Document Info -->
+            <div class="document-name" th:text="${doc.fileName}">Document Name</div>
+            <div class="document-meta">
+                Client: <strong th:text="${doc.client.clientName}">Client</strong>
+            </div>
+            <div class="document-meta">
+                Size: <span th:text="${doc.formattedFileSize}">0 KB</span>
+            </div>
+            <div class="document-meta">
+                Uploaded: <span th:text="${#temporals.format(doc.uploadDate, 'dd MMM yyyy')}">Date</span>
+            </div>
+
+            <!-- Category Badge -->
+            <span th:class="'category-badge category-' + ${doc.category.name().toLowerCase()}"
+                  th:text="${doc.category.displayName}">Category</span>
+
+            <!-- Actions -->
+            <div class="document-actions">
+                <a th:href="@{/documents/{id}/view(id=${doc.id})}"
+                   class="btn btn-primary btn-small">View</a>
+                <a th:href="@{/documents/{id}/download(id=${doc.id})}"
+                   class="btn btn-success btn-small">Download</a>
+                <form th:action="@{/documents/{id}/delete(id=${doc.id})}"
+                      method="post"
+                      style="display: inline;"
+                      onsubmit="return confirm('Are you sure you want to delete this document?')">
+                    <button type="submit" class="btn btn-danger btn-small">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" th:if="${documents == null or documents.empty}">
+        <h3>📂 No Documents Found</h3>
+        <p>Upload your first document to get started</p>
+        <a href="/documents/upload" class="btn btn-primary">Upload Document</a>
     </div>
 </div>
 </body>

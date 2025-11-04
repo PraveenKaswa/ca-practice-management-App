@@ -13,10 +13,17 @@ import com.camanagement.capractice.entity.Invoice;
 import com.camanagement.capractice.entity.InvoiceItem;
 import com.camanagement.capractice.repository.InvoiceRepository;
 import com.camanagement.capractice.repository.InvoiceItemRepository;
+import com.camanagement.capractice.entity.Document;
+import com.camanagement.capractice.entity.Document.DocumentCategory;
+import com.camanagement.capractice.repository.DocumentRepository;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -41,11 +48,15 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private ServiceRepository serviceRepository;
 
+    @Autowired
+    private DocumentRepository documentRepository;
+
     @Override
     public void run(String... args) throws Exception {
 
         // Check if data already exists
-        if (clientRepository.count() > 0 && serviceRepository.count() > 0) {
+        if (clientRepository.count() > 0 && serviceRepository.count() > 0 && invoiceRepository.count() > 0 &&
+                documentRepository.count() > 0) {
             System.out.println("Data already exists, skipping sample data creation.");
             return;
         }
@@ -70,6 +81,10 @@ public class DataLoader implements CommandLineRunner {
         // Create Invoices (NEW!)
         if (invoiceRepository.count() == 0) {
             createSampleInvoices();
+        }
+
+        if (documentRepository.count() == 0) {
+            createSampleDocuments();
         }
 
         printStatistics();
@@ -302,6 +317,8 @@ public class DataLoader implements CommandLineRunner {
         long activeServices = serviceRepository.countByStatus(Service.ServiceStatus.ACTIVE);
         long totalInvoices = invoiceRepository.count();
         long paidInvoices = invoiceRepository.countByStatus(Invoice.InvoiceStatus.PAID);
+        long totalDocuments = documentRepository.count();
+
 
 
         System.out.println("=== SAMPLE DATA STATISTICS ===");
@@ -311,6 +328,7 @@ public class DataLoader implements CommandLineRunner {
         System.out.println("Active services: " + activeServices);
         System.out.println("Total invoices: " + totalInvoices);
         System.out.println("Paid invoices: " + paidInvoices);
+        System.out.println("Total documents: " + totalDocuments);
         System.out.println("================================");
     }
 
@@ -591,6 +609,164 @@ public class DataLoader implements CommandLineRunner {
         invoiceRepository.save(invoice5);
 
         System.out.println("Sample invoices created successfully!");
+    }
+
+    private void createSampleDocuments() {
+        System.out.println("Creating sample documents...");
+
+        // Get clients
+        List<Client> clients = clientRepository.findAll();
+        if (clients.isEmpty()) {
+            System.out.println("No clients found. Skipping documents.");
+            return;
+        }
+
+        // Create upload directory if it doesn't exist
+        try {
+            Path uploadPath = Paths.get("uploads/documents/2024/11");
+            Files.createDirectories(uploadPath);
+            System.out.println("Created upload directory: " + uploadPath);
+        } catch (Exception e) {
+            System.err.println("Error creating upload directory: " + e.getMessage());
+        }
+        // Document 1: Tax document for Rajesh Kumar
+        Client rajesh = clients.stream()
+                .filter(c -> "Rajesh Kumar".equals(c.getClientName()))
+                .findFirst()
+                .orElse(clients.get(0));
+
+        Document doc1 = getDocument(rajesh);
+        documentRepository.save(doc1);
+
+        // Document 2: Bank statement for Rajesh
+        Document doc2 = new Document();
+        doc2.setFileName("Bank_Statement_Jan2024.pdf");
+        doc2.setFilePath("uploads/documents/2024/11/bank_statement_rajesh.pdf");
+        doc2.setFileSize(1048576L); // 1 MB
+        doc2.setFileType("application/pdf");
+        doc2.setFileExtension("pdf");
+        doc2.setClient(rajesh);
+        doc2.setCategory(DocumentCategory.FINANCIAL);
+        doc2.setDescription("HDFC Bank statement for January 2024");
+        doc2.setFinancialYear("2023-24");
+        doc2.setUploadedBy("Admin");
+        doc2.setUploadDate(LocalDateTime.of(2024, 2, 1, 14, 20));
+        doc2.setTags("bank statement, hdfc, january");
+        doc2.setIsDeleted(false);
+        documentRepository.save(doc2);
+
+        // Document 3: GST certificate for Priya Sharma
+        Client priya = clients.stream()
+                .filter(c -> "Priya Sharma".equals(c.getClientName()))
+                .findFirst()
+                .orElse(clients.get(1));
+
+        Document doc3 = new Document();
+        doc3.setFileName("GST_Registration_Certificate.pdf");
+        doc3.setFilePath("uploads/documents/2024/11/gst_cert_priya.pdf");
+        doc3.setFileSize(204800L); // 200 KB
+        doc3.setFileType("application/pdf");
+        doc3.setFileExtension("pdf");
+        doc3.setClient(priya);
+        doc3.setCategory(DocumentCategory.COMPLIANCE);
+        doc3.setDescription("GST Registration Certificate for Sharma Enterprises");
+        doc3.setFinancialYear("2023-24");
+        doc3.setUploadedBy("Admin");
+        doc3.setUploadDate(LocalDateTime.of(2024, 2, 28, 11, 45));
+        doc3.setTags("gst, registration, certificate, compliance");
+        doc3.setIsDeleted(false);
+        documentRepository.save(doc3);
+
+        // Document 4: Audit report for Patel
+        Client patel = clients.stream()
+                .filter(c -> c.getClientName().contains("Patel"))
+                .findFirst()
+                .orElse(clients.get(2));
+
+        if (patel != null) {
+            Document doc4 = new Document();
+            doc4.setFileName("Annual_Audit_Report_2023.pdf");
+            doc4.setFilePath("uploads/documents/2024/11/audit_report_patel.pdf");
+            doc4.setFileSize(2097152L); // 2 MB
+            doc4.setFileType("application/pdf");
+            doc4.setFileExtension("pdf");
+            doc4.setClient(patel);
+            doc4.setCategory(DocumentCategory.AUDIT);
+            doc4.setDescription("Annual audit report for FY 2022-23");
+            doc4.setFinancialYear("2022-23");
+            doc4.setUploadedBy("Admin");
+            doc4.setUploadDate(LocalDateTime.of(2024, 3, 10, 16, 0));
+            doc4.setTags("audit, annual report, 2023");
+            doc4.setIsDeleted(false);
+            documentRepository.save(doc4);
+        }
+
+        // Document 5: Excel file for Sunita
+        Client sunita = clients.stream()
+                .filter(c -> c.getClientName().contains("Sunita"))
+                .findFirst()
+                .orElse(clients.get(3));
+
+        if (sunita != null) {
+            Document doc5 = new Document();
+            doc5.setFileName("Financial_Statement_Q1_2024.xlsx");
+            doc5.setFilePath("uploads/documents/2024/11/financial_sunita.xlsx");
+            doc5.setFileSize(819200L); // 800 KB
+            doc5.setFileType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            doc5.setFileExtension("xlsx");
+            doc5.setClient(sunita);
+            doc5.setCategory(DocumentCategory.FINANCIAL);
+            doc5.setDescription("Quarterly financial statement Q1 2024");
+            doc5.setFinancialYear("2024-25");
+            doc5.setUploadedBy("Admin");
+            doc5.setUploadDate(LocalDateTime.of(2024, 4, 5, 9, 15));
+            doc5.setTags("financial statement, quarterly, excel");
+            doc5.setIsDeleted(false);
+            documentRepository.save(doc5);
+        }
+
+        // Document 6: PAN card copy for Ramesh
+        Client ramesh = clients.stream()
+                .filter(c -> c.getClientName().contains("Ramesh"))
+                .findFirst()
+                .orElse(clients.get(4));
+
+        if (ramesh != null) {
+            Document doc6 = new Document();
+            doc6.setFileName("PAN_Card_Copy.jpg");
+            doc6.setFilePath("uploads/documents/2024/11/pan_ramesh.jpg");
+            doc6.setFileSize(153600L); // 150 KB
+            doc6.setFileType("image/jpeg");
+            doc6.setFileExtension("jpg");
+            doc6.setClient(ramesh);
+            doc6.setCategory(DocumentCategory.IDENTITY);
+            doc6.setDescription("Scanned copy of PAN card");
+            doc6.setUploadedBy("Admin");
+            doc6.setUploadDate(LocalDateTime.now().minusDays(10));
+            doc6.setTags("pan card, identity, kyc");
+            doc6.setIsDeleted(false);
+            documentRepository.save(doc6);
+        }
+
+        System.out.println("Sample documents created successfully!");
+    }
+
+    private static Document getDocument(Client rajesh) {
+        Document doc1 = new Document();
+        doc1.setFileName("Form16_FY2023-24.pdf");
+        doc1.setFilePath("uploads/documents/2024/11/form16_rajesh.pdf");
+        doc1.setFileSize(524288L); // 512 KB
+        doc1.setFileType("application/pdf");
+        doc1.setFileExtension("pdf");
+        doc1.setClient(rajesh);
+        doc1.setCategory(DocumentCategory.TAX);
+        doc1.setDescription("Form 16 for FY 2023-24, received from employer");
+        doc1.setFinancialYear("2023-24");
+        doc1.setUploadedBy("Admin");
+        doc1.setUploadDate(LocalDateTime.of(2024, 1, 15, 10, 30));
+        doc1.setTags("income tax, salary, form16, 2023-24");
+        doc1.setIsDeleted(false);
+        return doc1;
     }
 
 

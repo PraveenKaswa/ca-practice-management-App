@@ -141,6 +141,7 @@ public class DocumentController {
             List<Client> allClients = clientRepository.findByStatusOrderByClientNameAsc(Client.ClientStatus.ACTIVE);
 
             // ADD DATA TO MODEL (pass to HTML template)
+            model.addAttribute("pageTitle", "Document Management");
             model.addAttribute("documents", documents);
             model.addAttribute("stats", stats);
             model.addAttribute("allClients", allClients);

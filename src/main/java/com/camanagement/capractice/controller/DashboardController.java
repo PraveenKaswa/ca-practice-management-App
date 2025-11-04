@@ -341,13 +341,6 @@ public class DashboardController {
         }
     }
 
-    @GetMapping("/documents")
-    public String documents(Model model) {
-        model.addAttribute("pageTitle", "Document Management");
-        // TODO: Add real document data when Document entity is created
-        return "documents";
-    }
-
     @GetMapping("/reports")
     public String reports(Model model) {
         try {
